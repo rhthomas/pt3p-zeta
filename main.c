@@ -16,15 +16,15 @@
  */
 
 #include <msp430.h>
-#include "zeta.h"
-#include "spi.h"
+//#include "zeta.h"
+//#include "spi.h"
 #include "uart.h"
-#include "hibernation.h"
+//#include "hibernation.h"
 
 // Globals for storing incoming bytes.
-uint8_t rxByte, len;
+//uint8_t rxByte, len;
 // 8B data packet. TODO Decide what size.
-uint8_t packet[8];
+//uint8_t packet[8];
 
 /**
  * Initialise IO pins and buses.
@@ -54,15 +54,15 @@ void io_init(void)
  */
 void clock_init(void)
 {
-    CSCTL0_H = CSKEY >> 8; // Unlock CS registers.
-    CSCTL1 = DCOFSEL0 | DCOFSEL1; // DCO set to max.
-    // ACLK = VLOCLK, SMCLK = DCOCLK, MCLK = DCOCLK
-    CSCTL2 = SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+    CSCTL0_H = 0xA5; // Unlock CS registers.
+    CSCTL1 |= DCORSEL | DCOFSEL0 | DCOFSEL1; // 24MHz
+    // ACLK = SMCLK = MCLK = DCOCLK
+    CSCTL2 |= SELA__DCOCLK | SELS__DCOCLK | SELM__DCOCLK;
     // No prescale on clocks.
-    CSCTL3 = DIVA__1 | DIVS__1 | DIVS__1;
+    CSCTL3 |= DIVA__1 | DIVS__2 | DIVM__1;
     // TODO Power down unused clocks.
     //CSCTL4 |= HFXTOFF | LFXTOFF | VLOOFF;
-    CSCTL0 = 0; // Lock the registers.
+    CSCTL0_H = 0; // Lock the registers.
 }
 
 /**
@@ -71,28 +71,24 @@ void clock_init(void)
 void main(void)
 {
     WDTCTL = WDTPW | WDTHOLD; // Stop watchdog timer
-    /* Disable the GPIO power-on default high-z mode to activate previously
-     * configured port settings. */
-    PM5CTL0 &= ~LOCKLPM5;
 
-    Hibernus(); // Begin hibernus.
+//    Hibernus(); // Begin hibernus.
 
     io_init();
     clock_init();
     uart_init();
-    spi_init();
-    zeta_init();
+//    spi_init();
+//    zeta_init();
 
-    zeta_ready(); // Wait for radio to be ready to rx commands.
+//    zeta_ready(); // Wait for radio to be ready to rx commands.
 
     while (1) {
-        zeta_rx_mode(0x00, 0x0c); // Rx mode on ch0, 12-byte packets.
-        zeta_rx_packet(&packet); // Rx packet and store in array.
+        __bis_SR_register(GIE);
+//        zeta_rx_mode(0x00, 0x0c); // Rx mode on ch0, 12-byte packets.
+//        zeta_rx_packet(&packet); // Rx packet and store in array.
+        PJOUT ^= BIT0;
 
-        /* TODO This may not be needed since next packet will take a while to
-         * come in. See how it performs. */
-        __delay_cycles(480000); // delay(20)
-
-        __bis_SR_register(LPM3_bits | GIE);
+        uart_putc(0x52); // 'R'
+        __delay_cycles(48000000);
     }
 }
