@@ -1,11 +1,12 @@
 /**
  * @file spi.h
- * @author Rhys Thomas
+ * @author Rhys Thomas <rt8g15@soton.ac.uk>
  * @date 2018-01-29T14:16
  *
  * @brief Simple SPI library for MSP430FR5739 MCU.
  *
- * @todo Consider using interrupts for receiving data.
+ * @todo Consider using interrupts for Tx/Rx data.
+ * @todo Check the SPI frequency works with the ZetaPlus.
  */
 /*
  * MSP430FR5739

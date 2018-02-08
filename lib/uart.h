@@ -5,8 +5,7 @@
  *
  * @brief UART functions for printing to the terminal.
  *
- * @todo Currently on the same eUSCI port as the SPI bus - change one.
- * @todo Populate ISR.
+ * @todo What to do with Rx'd UART data?
  */
 
 #ifndef UART_H
@@ -14,6 +13,9 @@
 
 #include <msp430.h>
 #include <stdint.h>
+
+#define TXPIN (BIT5) ///< UCA1TXD
+#define RXPIN (BIT6) ///< UCA1RXD
 
 /**
  * Initialise the UART peripheral. Useful for debugging.

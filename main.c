@@ -49,7 +49,8 @@ void io_init(void)
 /**
  * Initialise system clock.
  *
- * @todo Change the config for your project.
+ * @todo Change the configuration for your project.
+ * @todo What is the ZetaPlus SPI frequency?
  */
 void clock_init(void)
 {
@@ -66,14 +67,12 @@ void clock_init(void)
 
 /**
  * Main loop.
- *
- * @todo Enter into a LPM somewhere!
  */
 void main(void)
 {
     WDTCTL = WDTPW | WDTHOLD; // Stop watchdog timer
-    /* Disable the GPIO power-on default high-z mode to
-     * activate prev config port settings. */
+    /* Disable the GPIO power-on default high-z mode to activate previously
+     * configured port settings. */
     PM5CTL0 &= ~LOCKLPM5;
 
     Hibernus(); // Begin hibernus.
@@ -91,7 +90,9 @@ void main(void)
         zeta_rx_packet(&packet); // Rx packet and store in array.
 
         /* TODO This may not be needed since next packet will take a while to
-         * come in. */
+         * come in. See how it performs. */
         __delay_cycles(480000); // delay(20)
+
+        __bis_SR_register(LPM3_bits | GIE);
     }
 }

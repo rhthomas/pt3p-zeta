@@ -67,7 +67,7 @@ void zeta_set_baud(uint8_t baud)
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P2OUT |= SDN; // digitalWrite(SDN, HIGH);
-    // TODO check this number is correct, x/MCLK = delay(s)
+    // TODO Check this number is correct, x/MCLK = delay(s)
     __delay_cycles(480000); // 48e4/24e6 = 0.020 // delay(20);
     P2OUT &= ~SDN; // digitalWrite(SDN, LOW);
 }
@@ -105,7 +105,7 @@ void zeta_write_byte(uint8_t data)
 
 void zeta_send_close(void)
 {
-    // TODO check this number is correct, x/MCLK = delay(s)
+    // TODO Check this number is correct, x/MCLK = delay(s)
     __delay_cycles(480000); // 48e4/24e6 = 0.020 // delay(20);
     P2OUT |= CS; // digitalWrite(CS, HIGH);
 }
