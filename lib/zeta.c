@@ -68,7 +68,6 @@ void zeta_set_baud(uint8_t baud)
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P2OUT |= SDN; // digitalWrite(SDN, HIGH);
-    // TODO Check this number is correct, x/MCLK = delay(s)
     __delay_cycles(480000); // 48e4/24e6 = 0.020 // delay(20);
     P2OUT &= ~SDN; // digitalWrite(SDN, LOW);
 }
@@ -106,7 +105,6 @@ void zeta_write_byte(uint8_t data)
 
 void zeta_send_close(void)
 {
-    // TODO Check this number is correct, x/MCLK = delay(s)
     __delay_cycles(480000); // 48e4/24e6 = 0.020 // delay(20);
     spi_cs_high(); // digitalWrite(CS, HIGH);
 }
@@ -125,10 +123,10 @@ void zeta_rx_packet(uint8_t packet[])
 {
     uint8_t count = 0;
 
-    packet[0] = zeta_rx_byte(); // first byte is '#'
-    packet[1] = zeta_rx_byte(); // second byte is 'R'
-    packet[2] = count = zeta_rx_byte() - 4; // third byte is packet length
-    packet[3] = zeta_rx_byte(); // forth byte is RSSI value
+    packet[0] = zeta_rx_byte(); // '#'
+    packet[1] = zeta_rx_byte(); // 'R'
+    packet[2] = count = zeta_rx_byte() - 4; // packet length
+    packet[3] = zeta_rx_byte(); // RSSI
 
     // subsequent bytes are message data
     for (; count > 0; count--) {

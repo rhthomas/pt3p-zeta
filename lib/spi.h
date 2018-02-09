@@ -4,8 +4,6 @@
  * @date 2018-01-29T14:16
  *
  * @brief Simple SPI library for MSP430FR5739 MCU.
- *
- * @todo Consider using interrupts for Tx/Rx data.
  */
 /*
  * MSP430FR5739
@@ -14,6 +12,7 @@
  *    P2.0|-> Data Out (UCA0SIMO)
  *    P2.1|<- Data In (UCA0SOMI)
  *        |
+ *    P1.3|-> CS
  *    P1.5|-> Serial Clock Out (UCA0CLK)
  *        |
  * -------+

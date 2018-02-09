@@ -4,8 +4,6 @@
  * @date 2018-02-07T23:59
  *
  * @brief UART functions for printing to the terminal.
- *
- * @todo What to do with Rx'd UART data?
  */
 
 #ifndef UART_H
