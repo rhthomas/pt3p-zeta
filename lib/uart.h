@@ -14,8 +14,8 @@
 #include <msp430.h>
 #include <stdint.h>
 
-#define TXPIN (BIT5) ///< UCA1TXD
-#define RXPIN (BIT6) ///< UCA1RXD
+#define TXPIN (BIT0) ///< UCA0TXD
+#define RXPIN (BIT1) ///< UCA0RXD
 
 /**
  * Initialise the UART peripheral. Useful for debugging.
@@ -27,13 +27,13 @@ void uart_init(void);
  *
  * @param ch : Character byte to print.
  */
-void uart_putc(char ch);
+void uart_putc(unsigned char ch);
 
 /**
  * Print string of characters over UART.
  *
  * @param string : Pointer to string to print.
  */
-void uart_puts(char *string);
+void uart_puts(const char *string);
 
 #endif // UART_H

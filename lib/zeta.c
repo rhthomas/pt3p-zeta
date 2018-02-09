@@ -5,7 +5,7 @@ void zeta_init(void)
     // spi_init() will be called from main BEFORE zeta_init()
 
     // pinMode(CS, OUTPUT); pinMode(SDN, OUTPUT);
-    P2DIR |= (CS | SDN);
+    P2DIR |= SDN;
 
     // pinMode(IRQ, INPUT_PULLUP);
     P2DIR &= ~IRQ;
@@ -14,8 +14,9 @@ void zeta_init(void)
     P2IES |= IRQ; // triggers interrupt
     P2IE |= IRQ; // enables interrupt
 
-    // P2OUT |= CS; // digitalWrite(CS, HIGH);
-    P2OUT |= CS;
+    // digitalWrite(CS, HIGH);
+    spi_cs_high();
+
     // P2OUT &= ~SDN; // digitalWrite(SDN, LOW);
     P2OUT &= ~SDN; // hold device in wake state
 }
@@ -37,28 +38,28 @@ void zeta_ready(void)
 
 void zeta_select_mode(uint8_t mode)
 {
-    P2OUT &= ~CS; // digitalWrite(CS, LOW);
+    spi_cs_low(); // digitalWrite(CS, LOW);
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('M');
     spi_xfer(mode);
-    P2OUT |= CS; // digitalWrite(CS, HIGH);
+    spi_cs_high(); // digitalWrite(CS, HIGH);
 }
 
 void zeta_rx_mode(uint8_t ch, uint8_t pLength)
 {
-    P2OUT &= ~CS; // digitalWrite(CS, LOW);
+    spi_cs_low(); // digitalWrite(CS, LOW);
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('R');
     spi_xfer(ch);
     spi_xfer(pLength);
-    P2OUT |= CS; // digitalWrite(CS, HIGH);
+    spi_cs_high(); // digitalWrite(CS, HIGH);
 }
 
 void zeta_set_baud(uint8_t baud)
 {
-    P2OUT &= ~CS; // digitalWrite(CS, LOW);
+    spi_cs_low(); // digitalWrite(CS, LOW);
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('B');
@@ -74,7 +75,7 @@ void zeta_set_baud(uint8_t baud)
 
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
 {
-    P2OUT &= ~CS; // digitalWrite(CS, LOW);
+    spi_cs_low(); // digitalWrite(CS, LOW);
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('A');
@@ -83,12 +84,12 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
     spi_xfer(sync2);
     spi_xfer(sync3);
     spi_xfer(sync4);
-    P2OUT |= CS; // digitalWrite(CS, HIGH);
+    spi_cs_high(); // digitalWrite(CS, HIGH);
 }
 
 void zeta_send_packet(uint8_t ch, uint8_t pLength)
 {
-    P2OUT &= ~CS; // digitalWrite(CS, LOW);
+    spi_cs_low(); // digitalWrite(CS, LOW);
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('S');
@@ -107,15 +108,15 @@ void zeta_send_close(void)
 {
     // TODO Check this number is correct, x/MCLK = delay(s)
     __delay_cycles(480000); // 48e4/24e6 = 0.020 // delay(20);
-    P2OUT |= CS; // digitalWrite(CS, HIGH);
+    spi_cs_high(); // digitalWrite(CS, HIGH);
 }
 
 uint8_t zeta_rx_byte(void)
 {
     zeta_wait_irq();
-    P2OUT &= ~CS; // digitalWrite(CS, LOW);
+    spi_cs_low(); // digitalWrite(CS, LOW);
     uint8_t out = spi_xfer(0x00);
-    P2OUT |= CS; // digitalWrite(CS, HIGH);
+    spi_cs_high(); // digitalWrite(CS, HIGH);
 
     return out;
 }

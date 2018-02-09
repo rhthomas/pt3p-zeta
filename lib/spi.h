@@ -6,7 +6,6 @@
  * @brief Simple SPI library for MSP430FR5739 MCU.
  *
  * @todo Consider using interrupts for Tx/Rx data.
- * @todo Check the SPI frequency works with the ZetaPlus.
  */
 /*
  * MSP430FR5739
@@ -26,6 +25,7 @@
 #include <stdint.h>
 #include <msp430.h>
 
+#define CS   (BIT3) // P1.3 ///< Chip select pin for SPI.
 #define SCLK (BIT5) // P1.5
 #define MISO (BIT1) // P2.1
 #define MOSI (BIT0) // P2.0
@@ -42,5 +42,15 @@ void spi_init(void);
  * @return Data received from slave.
  */
 uint8_t spi_xfer(uint8_t byte);
+
+/**
+ * Set CS line high.
+ */
+void spi_cs_high(void);
+
+/**
+ * Set CS line low.
+ */
+void spi_cs_low(void);
 
 #endif // SPI_H

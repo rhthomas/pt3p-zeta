@@ -13,7 +13,6 @@
 #include <msp430.h>
 #include "spi.h"
 
-#define CS  (BIT3) ///< Chip select pin for SPI.
 #define SDN (BIT4) ///< Sleep pin (high, low) = (sleep, active).
 #define IRQ (BIT5) ///< Interrupt request.
 
