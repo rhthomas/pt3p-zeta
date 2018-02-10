@@ -1,7 +1,7 @@
 /**
  * @file uart.h
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-02-07T23:59
+ * @date 2018-02-07
  *
  * @brief UART functions for printing to the terminal.
  */

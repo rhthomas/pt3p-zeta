@@ -1,7 +1,7 @@
 /**
  * @file spi.h
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-01-29T14:16
+ * @date 2018-01-29
  *
  * @brief Simple SPI library for MSP430FR5739 MCU.
  */

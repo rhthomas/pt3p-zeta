@@ -1,7 +1,7 @@
 /**
  * @file test-uart.c
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-01-29T14:18
+ * @date 2018-02-08
  *
  * @brief UART library test.
  */

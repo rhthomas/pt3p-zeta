@@ -1,7 +1,7 @@
 /**
  * @file test-spi.c
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-01-29T14:18
+ * @date 2018-02-09
  *
  * @brief SPI library test.
  */
@@ -15,7 +15,8 @@
  */
 void main(void)
 {
-    WDTCTL = WDTPW | WDTHOLD; // Stop watchdog timer
+    // Stop watchdog timer
+    WDTCTL = WDTPW | WDTHOLD;
 
     io_init();
     clock_init();

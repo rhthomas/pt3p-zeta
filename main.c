@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-02-09T16:43
+ * @date 2018-02-09
  *
  * @brief Combined code of all modules, demonstrating the project
  * solution.
@@ -18,15 +18,17 @@
  *    LPM4.5 (now active).
  * 8. MCU then handles the radio reception and returns to LPM4.5 (repeat
  *    indefinitely from 6).
- *
- * @todo Add hibernus code.
  */
 
 // Libraries.
-#include "setup.h"
+#include "setup.h" // System setup functions
 #include "hibernation.h" // Hibernus++
+#include "RESTOP_func.h" // RESTOP add-on
+#include "Config.h" // RESTOP configuration
 #include "uart.h" // Debugging
 #include "zeta.h" // Radio
+
+uint8_t in_packet[PACKET_SIZE]; ///< Array for received data.
 
 /**
  * Main loop.
@@ -45,11 +47,24 @@ void main(void)
     spi_init();
     zeta_init();
 
+    // TODO Add RESTOP commands for ZetaPlus startup.
+
     // Main loop.
     while (1) {
+        // Go to sleep.
         __bis_SR_register(LPM4_bits | GIE);
-        // TODO Add radio interface code.
-        // ...
+        // Set Rx mode.
+        zeta_select_mode(1);
+        // Operating on channel 0 with packet size of 12 bytes.
+        zeta_rx_mode(CHANNEL, PACKET_SIZE);
+        // Get incoming packet.
+        zeta_rx_packet(&in_packet);
+        // Short delay after Rx'ing packet.
+        __delay_cycles(48e4); // ~0.020s
+        // Put radio to sleep.
+        zeta_select_mode(3);
+        // Re-enable UB20 interrupt when finished.
+        P1IE = BIT4;
     }
 }
 

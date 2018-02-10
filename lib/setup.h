@@ -1,7 +1,7 @@
 /**
  * @file setup.h
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-02-09T18:26
+ * @date 2018-02-09
  *
  * @brief Setup functions to initialise general peripherals.
  */
