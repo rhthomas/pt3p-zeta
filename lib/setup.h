@@ -12,6 +12,12 @@
 #include <msp430.h>
 
 /**
+ * @defgroup init Initialisation
+ * @brief Peripheral initialisation.
+ * @{
+ */
+
+/**
  * Initialise IO pins and buses.
  *
  * @see ULP4.1
@@ -22,8 +28,19 @@ void io_init(void);
 /**
  * Initialise system clock.
  *
- * MCLK  = DCO @ 24MHz, SMCLK = DCO/2 @ 12MHz, ACLK  = VLO @ 10kHz.
+ * | Clock | Module | Freq. |
+ * |-------|--------|-------|
+ * | MCLK  | DCO    | 24MHz |
+ * | SMCLK | DCO    | 12MHz |
+ * | ACLK  | DCO    | 10kHz |
  */
 void clock_init(void);
+
+/**
+ * Setup time for periodic transmissions.
+ */
+void timer_init(void);
+
+/** @} */
 
 #endif // SETUP_H

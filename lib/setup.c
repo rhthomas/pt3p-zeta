@@ -27,3 +27,11 @@ void clock_init(void)
     CSCTL4 |= XT2OFF | XT1OFF;
     CSCTL0_H = 0; // Lock the registers.
 }
+
+void timer_init(void)
+{
+    // ACLK, upmode, clear.
+    TA0CTL |= TASSEL__ACLK | MC_1;
+    TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
+    TA0CCR0 = 0x2710; // ~1s delay.
+}

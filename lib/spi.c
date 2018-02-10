@@ -6,7 +6,6 @@ void spi_init(void)
     P1OUT |= SCLK;
     P2DIR |= (MOSI | CS);
     P2DIR &= ~MISO;
-    // TODO Do inputs need pull-ups?
 
     // Secondary functionality of pins.
     P1SEL1 |= SCLK;
@@ -27,6 +26,7 @@ void spi_init(void)
 uint8_t spi_xfer(uint8_t byte)
 {
     UCA0TXBUF = byte;
+    // TODO Getting stuck here.
     while (!(UCA0IFG & UCA0TXBUF))
         ; // Wait until Tx buffer is ready.
     return UCA0RXBUF;

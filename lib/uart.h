@@ -12,11 +12,13 @@
 #include <msp430.h>
 #include <stdint.h>
 
-#define TXPIN (BIT0) ///< UCA0TXD
-#define RXPIN (BIT1) ///< UCA0RXD
+#define TXPIN (BIT5) ///< UCA1TXD on P2.5
+#define RXPIN (BIT6) ///< UCA1RXD on P2.6
 
 /**
  * Initialise the UART peripheral. Useful for debugging.
+ *
+ * @ingroup init
  */
 void uart_init(void);
 

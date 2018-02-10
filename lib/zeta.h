@@ -4,8 +4,6 @@
  * @date 2018-02-08
  *
  * @brief Library for interfacing with ZetaPlus radio module.
- *
- * @todo Add detailed description for groups.
  */
 
 #ifndef ZETA_H
@@ -15,42 +13,54 @@
 #include <msp430.h>
 #include "spi.h"
 
-#define SDN (BIT4) ///< Sleep pin (high, low) = (sleep, active).
-#define IRQ (BIT5) ///< Interrupt request.
+/**
+ * Shutdown pin.
+ *
+ * | SDN | Radio  |
+ * |-----|--------|
+ * | 0   | Active |
+ * | 1   | Shutdown (no register retention) |
+ */
+#define SDN (BIT3)
+#define IRQ (BIT5) ///< Interrupt request (active low).
 
 // f = 869.50e6 + (250e3 * 15) = 873.25MHz
 #define CHANNEL (15u) ///< Move nearer the 900MHz band for antenna.
 #define PACKET_SIZE (12u) ///< Size of packets in network.
 
 /**
- * @defgroup zeta_setup ZetaPlus Initialisation
- * Detailed description.
- * @{
- */
-
-/**
  * Setup the device.
  *
- * @todo Setup up the comms registers?
+ * 1. Sets up I/O pins. SDN low to keep the radio active.
+ * 2. Waits for radio to be ready for data.
+ * 3. Host baud = 57.6kbps
+ * 4. RF baud = 500kbps
+ * 5. Maximum RF output power.
+ * 6. Set unused sync bytes `{AA, AA, AA, AA}`.
+ *
+ * @ingroup init
+ * @note SPI initialisation function must be called before initialising the
+ * radio.
  */
 void zeta_init(void);
 
 /**
  * Wait for interrupt from CODEC (data ready).
+ *
+ * @todo Check these are correct.
  */
 void zeta_wait_irq(void);
 
 /**
- * Wait until device is ready for another command. Use after zeta_init()
- * command.
+ * Wait until device is ready for another command.
+ *
+ * @todo Check these are correct.
  */
 void zeta_ready(void);
 
-/** @} */
-
 /**
- * @defgroup zeta_config ZetaPlus Configuration
- * Detailed description.
+ * @defgroup config Radio Configuration
+ * @brief Functions to configure the radio settings (i.e. channel, mode etc).
  * @{
  */
 
@@ -77,10 +87,16 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength);
 /**
  * Set sync bytes and addressing after preamble [ATA].
  *
+ * These appear directly after the preamble in the Tx'd RF data. Can be used as
+ * a form of addressing. If the bytes are set, the radio will only pass on data
+ * which contains the correct sync bytes.
+ *
  * @param sync1 : Byte 1.
  * @param sync2 : Byte 2.
  * @param sync3 : Byte 3.
  * @param sync4 : Byte 4.
+ * @note Set all to `0xAA` if not required.
+ * @note Reverse order bytes, i.e. `2B`=`D4`, `D4`=`2B`.
  */
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4);
 
@@ -110,7 +126,8 @@ void zeta_set_baud_host(uint8_t baud);
  *      | 4      | 128.0kbps |
  *      | 5      | 256.0kbps |
  *      | 6      | 500.0kbps |
- * @todo Which is default?
+ * @note SDN must be toggled high/low for setting to take effect (~15ms).
+ * @warning Higher RF baud rate increases BER at longer range.
  */
 void zeta_set_baud_rf(uint8_t baud);
 
@@ -152,8 +169,8 @@ void zeta_reset_default(void);
 /** @} */
 
 /**
- * @defgroup zeta_tx ZetaPlus Transmission
- * Detailed description.
+ * @defgroup tx Transmission
+ * @brief Main API calls for transmitting packets.
  * @{
  */
 
@@ -188,8 +205,8 @@ void zeta_send_packet(uint8_t* packet, uint8_t len);
 /** @} */
 
 /**
- * @defgroup zeta_rx ZetaPlus Reception
- * Detailed description.
+ * @defgroup rx Reception
+ * @brief Main API calls for receiving packets.
  * @{
  */
 

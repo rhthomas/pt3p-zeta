@@ -4,7 +4,7 @@ void zeta_init(void)
 {
     // spi_init() will be called from main BEFORE zeta_init()
 
-    // pinMode(CS, OUTPUT); pinMode(SDN, OUTPUT);
+    // pinMode(SDN, OUTPUT);
     P2DIR |= SDN;
 
     // pinMode(IRQ, INPUT_PULLUP);
@@ -15,21 +15,32 @@ void zeta_init(void)
     // digitalWrite(CS, HIGH);
     spi_cs_high();
 
-    // P2OUT &= ~SDN; // digitalWrite(SDN, LOW);
+    // digitalWrite(SDN, LOW);
     P2OUT &= ~SDN; // hold device in wake state
+
+    // Wait for CODEC to be ready for commands.
+    zeta_ready();
+
+//    // Set host/rf baud rate.
+//    zeta_set_baud_host(4u);
+//    zeta_set_baud_rf(6u);
+//    // Max. TX power.
+//    zeta_set_rf_power(127u);
+//    // Set standard sync bytes (not required).
+//    zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
 }
 
 void zeta_wait_irq(void)
 {
     // while (digitalRead(IRQ) == HIGH)
-    while (!(P2IN & IRQ))
+    while (P2IN & IRQ)
         ;
 }
 
 void zeta_ready(void)
 {
     // while (digitalRead(IRQ) == LOW)
-    while (P2IN & IRQ)
+    while (!(P2IN & IRQ))
         ;
 }
 

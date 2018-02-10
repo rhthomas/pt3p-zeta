@@ -12,7 +12,7 @@
  *    P2.0|-> Data Out (UCA0SIMO)
  *    P2.1|<- Data In (UCA0SOMI)
  *        |
- *    P1.3|-> CS
+ *    P1.4|-> CS (UCA0STE)
  *    P1.5|-> Serial Clock Out (UCA0CLK)
  *        |
  * -------+
@@ -24,13 +24,15 @@
 #include <stdint.h>
 #include <msp430.h>
 
-#define CS   (BIT3) // P1.3 ///< Chip select pin for SPI.
+#define CS   (BIT4) // P1.4 ///< Chip select pin for SPI.
 #define SCLK (BIT5) // P1.5
 #define MISO (BIT1) // P2.1
 #define MOSI (BIT0) // P2.0
 
 /**
  * Initialises the SPI peripheral on eUSCI A0.
+ *
+ * @ingroup init
  */
 void spi_init(void);
 
