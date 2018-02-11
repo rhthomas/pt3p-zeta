@@ -21,13 +21,13 @@ void zeta_init(void)
     // Wait for CODEC to be ready for commands.
     zeta_ready();
 
-//    // Set host/rf baud rate.
-//    zeta_set_baud_host(4u);
-//    zeta_set_baud_rf(6u);
-//    // Max. TX power.
-//    zeta_set_rf_power(127u);
-//    // Set standard sync bytes (not required).
-//    zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
+    // Set host/rf baud rate.
+    zeta_set_baud_host(4u);
+    zeta_set_baud_rf(6u);
+    // Max. TX power.
+    zeta_set_rf_power(127u);
+    // Set standard sync bytes (not required).
+    zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
 }
 
 void zeta_wait_irq(void)

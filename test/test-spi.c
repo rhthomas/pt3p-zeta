@@ -25,7 +25,7 @@ void main(void)
     while (1) {
         __bis_SR_register(GIE);
         spi_xfer(0xaa); // 10101010
-        __delay_cycles(2400000); // ~1s delay
+        __delay_cycles(24e5); // ~1s delay
         PJOUT ^= BIT0;
     }
 }

@@ -26,8 +26,7 @@ void spi_init(void)
 uint8_t spi_xfer(uint8_t byte)
 {
     UCA0TXBUF = byte;
-    // TODO Getting stuck here.
-    while (!(UCA0IFG & UCA0TXBUF))
+    while (!(UCA0IFG & UCTXIFG))
         ; // Wait until Tx buffer is ready.
     return UCA0RXBUF;
 }
