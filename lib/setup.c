@@ -13,8 +13,7 @@ void io_init(void)
     // Reset interrupt flags.
     PAIFG = 0;
     PBIFG = 0;
-    // Setup UB20 interrupt on P1.3.
-
+    /// @todo Setup UB20 interrupt on P1.3.
 }
 
 void clock_init(void)
@@ -22,9 +21,9 @@ void clock_init(void)
     CSCTL0_H = 0xA5; // Unlock CS registers.
     CSCTL1 |= DCORSEL | DCOFSEL0 | DCOFSEL1; // 24MHz
     // ACLK = SMCLK = MCLK = DCOCLK
-    CSCTL2 |= SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+    CSCTL2 = SELA_1 | SELS_3 | SELM_3;
     // SMCLK=DCO/2
-    CSCTL3 |= DIVA__1 | DIVS__2 | DIVM__1;
+    CSCTL3 = DIVA_0 | DIVS_1 | DIVM_0;
     // Power down unused clocks.
     CSCTL4 |= XT2OFF | XT1OFF;
     CSCTL0_H = 0; // Lock the registers.

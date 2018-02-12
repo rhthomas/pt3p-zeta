@@ -162,6 +162,20 @@ uint8_t zeta_get_rssi(void)
     return rssi;
 }
 
+void zeta_get_vers(void)
+{
+    spi_cs_low();
+    spi_xfer(65);
+    spi_xfer(84);
+    spi_xfer(86);
+
+    uint8_t i;
+    for (i = 6; i > 0; i--) {
+        spi_xfer(0); // '#' '1' '.' '0' '1'
+    }
+    spi_cs_high();
+}
+
 void zeta_reset_default(void)
 {
     spi_cs_low();
@@ -196,18 +210,17 @@ void zeta_send_close(void)
 {
     /// @test Is this required?
     __delay_cycles(48e4); // 48e4/24e6 = 0.020 // delay(20);
+    spi_cs_high();
 }
 
 void zeta_send_packet(uint8_t packet[], uint8_t len)
 {
-    spi_cs_low();
     zeta_send_open(CHANNEL, len);
     uint8_t i;
     for (i = 0; i < len; i++) {
         zeta_write_byte(packet[i]);
     }
     zeta_send_close();
-    spi_cs_high();
 }
 
 uint8_t zeta_rx_byte(void)

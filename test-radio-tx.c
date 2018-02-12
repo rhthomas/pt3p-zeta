@@ -32,7 +32,7 @@ void main(void)
     spi_init();
     zeta_init();
 
-    zeta_select_mode(2u);
+    zeta_select_mode(1u);
 
     // Main loop.
     while (1) {
@@ -40,7 +40,7 @@ void main(void)
         __bis_SR_register(LPM3_bits | GIE);
         // Send packet. Returns to previous state (sleep) when done.
 //        zeta_send_packet(msg, sizeof(msg));
-        Set_Binary_value(zeta_get_vers());
+        zeta_get_vers();
     }
 }
 

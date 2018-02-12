@@ -17,10 +17,9 @@ void spi_init(void)
      * Synchronous mode.
      * MSB first. */
     UCA0CTLW0 |= UCMST | UCSYNC | UCMSB;
-    // SMCLK @ 12MHz
-    UCA0CTLW0 |= UCSSEL__SMCLK;
-    UCA0BR0 |= 0x0b; // Run the SPI clk at 1MHz
-    UCA0BR1 |= 0;
+    UCA0CTLW0 |= UCSSEL__SMCLK; // SMCLK @ 12MHz
+    UCA0MCTLW = 0; // No modulation.
+    UCA0BRW = 0x000b; // Run the SPI clk at 1MHz
     UCA0CTLW0 &= ~UCSWRST; // initialise the state-machine
 }
 

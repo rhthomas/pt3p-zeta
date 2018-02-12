@@ -190,9 +190,9 @@ uint8_t zeta_get_rssi(void);
 
 /**
  *
- * @return Firmware version of the radio.
+ * @bug Used for debugging the radio.
  */
-uint8_t zeta_get_vers(void);
+void zeta_get_vers(void);
 
 /**
  * Reset the radio to its power on defaults [ATD].
