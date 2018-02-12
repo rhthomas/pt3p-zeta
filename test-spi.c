@@ -4,12 +4,17 @@
  * @date 2018-02-09
  *
  * @brief SPI library test.
+ *
+ * @details Makes calls from the zeta.h library in order to test that SPI
+ * commands are being correctly send out of the MOSI port.
  */
 
 // Libraries.
 #include "setup.h"
 #include "spi.h"
 #include "zeta.h"
+
+uint8_t packet[12];
 
 /**
  * Main loop.
@@ -30,15 +35,16 @@ void main(void)
         // Go to sleep. Wait for timer interrupt.
         __bis_SR_register(LPM3_bits | GIE);
         // Send some SPI data.
-        zeta_set_baud_rf(6u);
+//        spi_xfer(0xAA);
+        zeta_set_baud_host(4u);
     }
 }
 
 /**
  * Timer overflow ISR.
  *
- * Triggers every ~1s and exits the processor from LPM3. The MCU then sends a
- * packet onto the ether, sleeps the radio and returns to LPM3.
+ * Triggers every ~1s and exits the processor from LPM3. The MCU then sends SPI
+ * data out of the SPI peripheral and returns to sleep.
  */
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void TIMER0_ISR(void)

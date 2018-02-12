@@ -4,6 +4,19 @@
  * @date 2018-02-08
  *
  * @brief Library for interfacing with ZetaPlus radio module.
+ *
+ * @details Pin-out:
+ * ```
+ * MSP430FR5739
+ * -------+
+ *        |
+ *    P3.3|-> Shutdown (SDN)
+ *    P1.3|<- Interrupt request (nIRQ)
+ *        |
+ * -------+
+ * ```
+ *
+ * @sa spi.h for SPI related connections.
  */
 
 #ifndef ZETA_H
@@ -41,7 +54,6 @@
  * \f$ f = 869.50\mbox{MHz} + (250\mbox{kHz} \times 15) = 873.25\mbox{MHz} \f$
  */
 #define CHANNEL (15u)
-#define PACKET_SIZE (12u) ///< Size of packets in network.
 
 /**
  * Setup the device.
@@ -177,6 +189,12 @@ void zeta_enable_crc(uint8_t en);
 uint8_t zeta_get_rssi(void);
 
 /**
+ *
+ * @return Firmware version of the radio.
+ */
+uint8_t zeta_get_vers(void);
+
+/**
  * Reset the radio to its power on defaults [ATD].
  */
 void zeta_reset_default(void);
@@ -215,10 +233,9 @@ void zeta_send_close(void);
  * Send byte packet over radio.
  *
  * @param packet : Pointer to byte packet to send.
- * @note Currently fixed length packets.
- * @see PACKET_SIZE.
+ * @param len : Length of packet.
  */
-void zeta_send_packet(uint8_t packet[]);
+void zeta_send_packet(uint8_t packet[], uint8_t len);
 
 /** @} */
 

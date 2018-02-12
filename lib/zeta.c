@@ -12,11 +12,10 @@ void zeta_init(void)
     P1REN |= IRQ; // enable pull resistor
     P1OUT |= IRQ; // pull up
 
-    // digitalWrite(CS, HIGH);
-//    spi_cs_high();
-
     // digitalWrite(SDN, LOW);
     P3OUT &= ~SDN; // hold device in wake state
+
+    spi_cs_high();
 
     // Wait for CODEC to be ready for commands.
     zeta_ready();
@@ -50,12 +49,12 @@ void zeta_select_mode(uint8_t mode)
         // Invalid arguments.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('M');
     spi_xfer(mode);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 }
 
 void zeta_rx_mode(uint8_t ch, uint8_t pLength)
@@ -64,18 +63,18 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength)
         // Invalid arguments.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('R');
     spi_xfer(ch);
     spi_xfer(pLength);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 }
 
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
 {
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('A');
@@ -84,7 +83,7 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
     spi_xfer(sync2);
     spi_xfer(sync3);
     spi_xfer(sync4);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 }
 
 void zeta_set_baud_host(uint8_t baud)
@@ -93,12 +92,12 @@ void zeta_set_baud_host(uint8_t baud)
         // Invalid argument.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('H');
     spi_xfer(baud);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 }
 
 void zeta_set_baud_rf(uint8_t baud)
@@ -107,12 +106,12 @@ void zeta_set_baud_rf(uint8_t baud)
         // Invalid argument.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('B');
     spi_xfer(baud);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P3OUT |= SDN; // digitalWrite(SDN, HIGH);
@@ -126,12 +125,12 @@ void zeta_set_rf_power(uint8_t pwr)
         // Invalid arguments.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('P');
     spi_xfer(pwr);
-//    spi_cs_high(); // digitalWrite(CS, LOW);
+    spi_cs_high();
 }
 
 void zeta_enable_crc(uint8_t en)
@@ -140,17 +139,17 @@ void zeta_enable_crc(uint8_t en)
         // Invalid arguments.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('E');
     spi_xfer(en);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 }
 
 uint8_t zeta_get_rssi(void)
 {
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('Q');
@@ -158,18 +157,18 @@ uint8_t zeta_get_rssi(void)
     spi_xfer(0x00); // '#'
     spi_xfer(0x00); // 'Q'
     uint8_t rssi = spi_xfer(0x00); // RSSI value.
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 
     return rssi;
 }
 
 void zeta_reset_default(void)
 {
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('D');
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
+    spi_cs_high();
 }
 
 void zeta_send_open(uint8_t ch, uint8_t pLength)
@@ -178,7 +177,7 @@ void zeta_send_open(uint8_t ch, uint8_t pLength)
         // Invalid arguments.
         return;
     }
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     spi_xfer('A');
     spi_xfer('T');
     spi_xfer('S');
@@ -195,31 +194,32 @@ void zeta_write_byte(uint8_t data)
 
 void zeta_send_close(void)
 {
+    /// @test Is this required?
     __delay_cycles(48e4); // 48e4/24e6 = 0.020 // delay(20);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
 }
 
-void zeta_send_packet(uint8_t packet[])
+void zeta_send_packet(uint8_t packet[], uint8_t len)
 {
-    zeta_send_open(CHANNEL, PACKET_SIZE);
+    spi_cs_low();
+    zeta_send_open(CHANNEL, len);
     uint8_t i;
-    for (i = 0; i < PACKET_SIZE; i++) {
+    for (i = 0; i < len; i++) {
         zeta_write_byte(packet[i]);
     }
     zeta_send_close();
+    spi_cs_high();
 }
 
 uint8_t zeta_rx_byte(void)
 {
     zeta_wait_irq();
-//    spi_cs_low(); // digitalWrite(CS, LOW);
+    spi_cs_low();
     uint8_t out = spi_xfer(0x00);
-//    spi_cs_high(); // digitalWrite(CS, HIGH);
-
+    spi_cs_high();
     return out;
 }
 
-void zeta_rx_packet(uint8_t* packet)
+void zeta_rx_packet(uint8_t packet[])
 {
     uint8_t count = 0;
 
