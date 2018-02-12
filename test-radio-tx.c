@@ -32,7 +32,7 @@ void main(void)
     spi_init();
     zeta_init();
 
-    zeta_select_mode(1u);
+    zeta_select_mode(2u);
 
     // Main loop.
     while (1) {
