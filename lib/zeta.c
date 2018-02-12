@@ -195,15 +195,15 @@ void zeta_write_byte(uint8_t data)
 
 void zeta_send_close(void)
 {
-    __delay_cycles(480000); // 48e4/24e6 = 0.020 // delay(20);
+    __delay_cycles(48e4); // 48e4/24e6 = 0.020 // delay(20);
     spi_cs_high(); // digitalWrite(CS, HIGH);
 }
 
-void zeta_send_packet(uint8_t* packet, uint8_t len)
+void zeta_send_packet(uint8_t* packet)
 {
-    zeta_send_open(CHANNEL, len);
+    zeta_send_open(CHANNEL, PACKET_SIZE);
     uint8_t i;
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < PACKET_SIZE; i++) {
         zeta_write_byte(packet[i]);
     }
     zeta_send_close();

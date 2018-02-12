@@ -42,8 +42,6 @@ void main(void)
         zeta_rx_packet(&in_packet);
         // Short delay after Rx'ing packet.
         __delay_cycles(48e4); // ~0.020s
-        // Put radio to sleep.
-        zeta_select_mode(3);
         // Print packet contents to terminal.
         for (count = 0; count < PACKET_SIZE; count++) {
             uart_putc(in_packet[count]);

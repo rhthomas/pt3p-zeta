@@ -41,13 +41,13 @@ void main(void)
     // Setup peripherals.
     io_init();
     clock_init();
-    // TODO This has its own clock/port setup code. Check this.
+    /// @todo This has its own clock/port setup code. Check this.
     Hibernus();
     uart_init();
     spi_init();
     zeta_init();
 
-    // TODO Add RESTOP commands for ZetaPlus startup.
+    /// @todo Add RESTOP commands for ZetaPlus startup.
 
     // Main loop.
     while (1) {
@@ -68,7 +68,7 @@ void main(void)
     }
 }
 
-// TODO Currently interrupting on P1.4, change this.
+/// @todo Currently interrupting on P1.4, change this.
 #pragma vector=PORT1_VECTOR
 __interrupt void PORT1_ISR(void)
 {

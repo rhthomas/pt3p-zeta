@@ -36,8 +36,6 @@ void main(void)
         __bis_SR_register(LPM3_bits | GIE);
         // Send packet. Returns to previous state (sleep) when done.
         zeta_send_packet(&msg, sizeof(msg));
-        // Put radio to sleep.
-        zeta_select_mode(3);
     }
 }
 

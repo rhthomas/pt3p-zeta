@@ -24,7 +24,14 @@
 #define SDN (BIT3)
 #define IRQ (BIT5) ///< Interrupt request (active low).
 
-// f = 869.50e6 + (250e3 * 15) = 873.25MHz
+/**
+ * Channel of operation, 250kHz increments.
+ *
+ * We use this to move closer to the 900MHz band that the UB20 antennas are
+ * tuned to.
+ *
+ * \f$ f = 869.50\mbox{MHz} + (250\mbox{kHz} \times 15) = 873.25\mbox{MHz} \f$
+ */
 #define CHANNEL (15u) ///< Move nearer the 900MHz band for antenna.
 #define PACKET_SIZE (12u) ///< Size of packets in network.
 
@@ -47,14 +54,14 @@ void zeta_init(void);
 /**
  * Wait for interrupt from CODEC (data ready).
  *
- * @todo Check these are correct.
+ * @test Check these are correct.
  */
 void zeta_wait_irq(void);
 
 /**
  * Wait until device is ready for another command.
  *
- * @todo Check these are correct.
+ * @test Check these are correct.
  */
 void zeta_ready(void);
 
@@ -157,7 +164,7 @@ void zeta_enable_crc(uint8_t en);
  * Get RSSI from receiver [ATQ].
  *
  * @return Received signal strength (0-255).
- * @todo Check this method is correct. Does nIRQ need to go high?
+ * @test Check this method is correct. Does nIRQ need to go high?
  */
 uint8_t zeta_get_rssi(void);
 
@@ -177,8 +184,8 @@ void zeta_reset_default(void);
 /**
  * Transmit mode configuration [ATS].
  *
- * @param ch : Channel to transmit on.
- * @param pLength : Length of packet.
+ * @param ch : Channel to transmit on. @see CHANNEL.
+ * @param pLength : Length of packet. @see PACKET_SIZE.
  */
 void zeta_send_open(uint8_t ch, uint8_t pLength);
 
@@ -198,9 +205,9 @@ void zeta_send_close(void);
  * Send byte packet over radio.
  *
  * @param packet : Pointer to byte packet to send.
- * @param len : Length of packet you're sending.
+ * @note Currently fixed length packets. @see PACKET_SIZE.
  */
-void zeta_send_packet(uint8_t* packet, uint8_t len);
+void zeta_send_packet(uint8_t* packet);
 
 /** @} */
 
@@ -221,7 +228,7 @@ uint8_t zeta_rx_byte(void);
  * Read packet from FIFO loop until empty.
  *
  * @param[out] packet : Array to return Rx'd packet to.
- * @todo Confirm that this works as expected.
+ * @test Confirm that this works as expected.
  */
 void zeta_rx_packet(uint8_t* packet);
 
