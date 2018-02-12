@@ -13,6 +13,8 @@ void io_init(void)
     // Reset interrupt flags.
     PAIFG = 0;
     PBIFG = 0;
+    // Setup UB20 interrupt on P1.3.
+
 }
 
 void clock_init(void)

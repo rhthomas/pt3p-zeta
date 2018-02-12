@@ -64,15 +64,14 @@ void main(void)
         // Put radio to sleep.
         zeta_select_mode(3);
         // Re-enable UB20 interrupt when finished.
-        P1IE = BIT4;
+        P1IE = BIT3;
     }
 }
 
-/// @todo Currently interrupting on P1.4, change this.
 #pragma vector=PORT1_VECTOR
 __interrupt void PORT1_ISR(void)
 {
-    P1IFG &= ~BIT4; // Clear P1.4 interrupt flag.
+    P1IFG &= ~BIT3; // Clear P1.3 interrupt flag.
     P1IE = 0; // Disable interrupts.
     /* This clears the LPM4 bits which puts the processor back into
      * active mode. When leaving the ISR, the code then continues from

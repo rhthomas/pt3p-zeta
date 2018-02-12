@@ -20,8 +20,9 @@
 /**
  * Initialise IO pins and buses.
  *
+ * All ports are output, driven low and interrupt flags are cleared.
+ *
  * @see ULP4.1
- * @todo Setup P1.4 interrupt (rising edge?).
  */
 void io_init(void);
 

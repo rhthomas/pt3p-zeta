@@ -16,13 +16,21 @@
 /**
  * Shutdown pin.
  *
+ * P3.3
+ *
  * | SDN | Radio  |
  * |-----|--------|
  * | 0   | Active |
  * | 1   | Shutdown (no register retention) |
  */
 #define SDN (BIT3)
-#define IRQ (BIT5) ///< Interrupt request (active low).
+
+/**
+ * Interrupt request (active low).
+ *
+ * P1.3
+ */
+#define IRQ (BIT3)
 
 /**
  * Channel of operation, 250kHz increments.
@@ -32,7 +40,7 @@
  *
  * \f$ f = 869.50\mbox{MHz} + (250\mbox{kHz} \times 15) = 873.25\mbox{MHz} \f$
  */
-#define CHANNEL (15u) ///< Move nearer the 900MHz band for antenna.
+#define CHANNEL (15u)
 #define PACKET_SIZE (12u) ///< Size of packets in network.
 
 /**
@@ -184,8 +192,10 @@ void zeta_reset_default(void);
 /**
  * Transmit mode configuration [ATS].
  *
- * @param ch : Channel to transmit on. @see CHANNEL.
- * @param pLength : Length of packet. @see PACKET_SIZE.
+ * @param ch : Channel to transmit on.
+ * @param pLength : Length of packet.
+ * @see CHANNEL.
+ * @see PACKET_SIZE.
  */
 void zeta_send_open(uint8_t ch, uint8_t pLength);
 
@@ -205,9 +215,10 @@ void zeta_send_close(void);
  * Send byte packet over radio.
  *
  * @param packet : Pointer to byte packet to send.
- * @note Currently fixed length packets. @see PACKET_SIZE.
+ * @note Currently fixed length packets.
+ * @see PACKET_SIZE.
  */
-void zeta_send_packet(uint8_t* packet);
+void zeta_send_packet(uint8_t packet[]);
 
 /** @} */
 

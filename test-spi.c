@@ -1,19 +1,15 @@
 /**
- * @file test-radio-tx.c
+ * @file test-spi.c
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-02-10
+ * @date 2018-02-09
  *
- * @brief Testing transmission on the radio module.
+ * @brief SPI library test.
  */
 
 // Libraries.
-#include "setup.h" // System setup functions
-#include "zeta.h" // Radio
-
-uint8_t msg[PACKET_SIZE] = {
-        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x01, 0x02,
-        0x03, 0x04, 0x05, 0x06
-};
+#include "setup.h"
+#include "spi.h"
+#include "zeta.h"
 
 /**
  * Main loop.
@@ -28,14 +24,13 @@ void main(void)
     clock_init();
     timer_init();
     spi_init();
-    zeta_init();
 
     // Main loop.
     while (1) {
         // Go to sleep. Wait for timer interrupt.
         __bis_SR_register(LPM3_bits | GIE);
-        // Send packet. Returns to previous state (sleep) when done.
-        zeta_send_packet(msg);
+        // Send some SPI data.
+        zeta_set_baud_rf(6u);
     }
 }
 
