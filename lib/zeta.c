@@ -1,5 +1,14 @@
 #include "zeta.h"
 
+static uint8_t rev_table[16] = {
+    0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7,
+    0xf};
+
+uint8_t reverse(uint8_t byte)
+{
+    return (rev_table[byte & 0x0F] << 4) | rev_table[byte >> 4];
+}
+
 void zeta_init(void)
 {
     // spi_init() will be called from main BEFORE zeta_init()
@@ -77,10 +86,10 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
     zeta_tx_byte('T');
     zeta_tx_byte('A');
 
-    zeta_tx_byte(sync1);
-    zeta_tx_byte(sync2);
-    zeta_tx_byte(sync3);
-    zeta_tx_byte(sync4);
+    zeta_tx_byte(reverse(sync1));
+    zeta_tx_byte(reverse(sync2));
+    zeta_tx_byte(reverse(sync3));
+    zeta_tx_byte(reverse(sync4));
 }
 
 void zeta_set_baud_host(uint8_t baud)

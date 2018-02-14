@@ -11,9 +11,9 @@
 #include "zeta.h" // Radio
 
 ///< Dummy test packet to send, 12-bytes of 0b10101010.
-uint8_t msg[12u] = {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
-        0xAA, 0xAA
-};
+uint8_t msg[12u] = {
+    0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
+    0xAA};
 
 void Set_Binary_value(unsigned int v);
 
@@ -24,7 +24,6 @@ void main(void)
 {
     // Stop watchdog timer.
     WDTCTL = (WDTPW | WDTHOLD);
-//    PM5CTL0 &= ~LOCKLPM5;
 
     // Setup peripherals.
     io_init();

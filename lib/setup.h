@@ -10,6 +10,7 @@
 #define SETUP_H
 
 #include <msp430.h>
+#include <stdint.h>
 
 /**
  * @defgroup init Initialisation

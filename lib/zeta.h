@@ -56,6 +56,17 @@
 #define CHANNEL (15u)
 
 /**
+ * Reverses the order of a byte.
+ *
+ * Called within zeta_sync_byte().
+ *
+ * @param byte : Byte to flip.
+ * @return Reverse byte.
+ * @see zeta_sync_byte()
+ */
+uint8_t reverse(uint8_t byte);
+
+/**
  * Setup the device.
  *
  * 1. Sets up I/O pins. SDN low to keep the radio active.
@@ -181,10 +192,18 @@ void zeta_set_rf_power(uint8_t pwr);
 void zeta_enable_crc(uint8_t en);
 
 /**
+ * Reset the radio to its power on defaults [ATD].
+ */
+void zeta_reset_default(void);
+
+/** @} */
+
+/**
  * Get RSSI from receiver [ATQ].
  *
  * @return Received signal strength (0-255).
  * @test Check this method is correct. Does nIRQ need to go high?
+ * @ingroup debug
  */
 uint8_t zeta_get_rssi(void);
 
@@ -192,6 +211,7 @@ uint8_t zeta_get_rssi(void);
  * Get version of radio firmware.
  *
  * @note To see output, attach Saleae.
+ * @bug Potential race condition with !(P1IN & IRQ) poll.
  * @ingroup debug
  */
 void zeta_get_vers(void);
@@ -213,13 +233,6 @@ void zeta_get_vers(void);
  * @ingroup debug
  */
 void zeta_get_settings(void);
-
-/**
- * Reset the radio to its power on defaults [ATD].
- */
-void zeta_reset_default(void);
-
-/** @} */
 
 /**
  * @defgroup tx Transmission
