@@ -23,7 +23,8 @@ void Set_Binary_value(unsigned int v);
 void main(void)
 {
     // Stop watchdog timer.
-    WDTCTL = WDTPW | WDTHOLD;
+    WDTCTL = (WDTPW | WDTHOLD);
+//    PM5CTL0 &= ~LOCKLPM5;
 
     // Setup peripherals.
     io_init();
@@ -39,9 +40,9 @@ void main(void)
         // Go to sleep. Wait for timer interrupt.
         __bis_SR_register(LPM3_bits | GIE);
         // Send packet. Returns to previous state (sleep) when done.
-//        zeta_get_vers();
-//        zeta_get_settings();
-        zeta_send_packet(msg, sizeof(msg));
+        zeta_get_vers();
+        zeta_get_settings();
+//        zeta_send_packet(msg, sizeof(msg));
     }
 }
 

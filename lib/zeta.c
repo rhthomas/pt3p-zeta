@@ -14,11 +14,13 @@ void zeta_init(void)
 
     // digitalWrite(SDN, LOW);
     P3OUT &= ~SDN; // hold device in wake state
-
-    spi_cs_high();
+//
+//    spi_cs_high();
 
     // Wait for CODEC to be ready for commands.
     zeta_ready();
+
+    __delay_cycles(6e5); // 600ms
 
     // Set host/rf baud rate.
     zeta_set_baud_host(4u);
@@ -50,12 +52,10 @@ void zeta_select_mode(uint8_t mode)
         // Invalid arguments.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('M');
-    spi_xfer(mode);
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('M');
+    zeta_tx_byte(mode);
 }
 
 void zeta_rx_mode(uint8_t ch, uint8_t pLength)
@@ -64,27 +64,23 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength)
         // Invalid arguments.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('R');
-    spi_xfer(ch);
-    spi_xfer(pLength);
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('R');
+    zeta_tx_byte(ch);
+    zeta_tx_byte(pLength);
 }
 
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
 {
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('A');
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('A');
 
-    spi_xfer(sync1);
-    spi_xfer(sync2);
-    spi_xfer(sync3);
-    spi_xfer(sync4);
-    spi_cs_high();
+    zeta_tx_byte(sync1);
+    zeta_tx_byte(sync2);
+    zeta_tx_byte(sync3);
+    zeta_tx_byte(sync4);
 }
 
 void zeta_set_baud_host(uint8_t baud)
@@ -93,12 +89,10 @@ void zeta_set_baud_host(uint8_t baud)
         // Invalid argument.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('H');
-    spi_xfer(baud);
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('H');
+    zeta_tx_byte(baud);
 }
 
 void zeta_set_baud_rf(uint8_t baud)
@@ -107,16 +101,14 @@ void zeta_set_baud_rf(uint8_t baud)
         // Invalid argument.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('B');
-    spi_xfer(baud);
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('B');
+    zeta_tx_byte(baud);
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P3OUT |= SDN; // digitalWrite(SDN, HIGH);
-    __delay_cycles(48e4); // 48e4/24e6 = 0.020 // delay(20);
+    __delay_cycles(2e4); // 2e4/1e6 = 0.020s // delay(20);
     P3OUT &= ~SDN; // digitalWrite(SDN, LOW);
 }
 
@@ -126,12 +118,10 @@ void zeta_set_rf_power(uint8_t pwr)
         // Invalid arguments.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('P');
-    spi_xfer(pwr);
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('P');
+    zeta_tx_byte(pwr);
 }
 
 void zeta_enable_crc(uint8_t en)
@@ -140,64 +130,54 @@ void zeta_enable_crc(uint8_t en)
         // Invalid arguments.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('E');
-    spi_xfer(en);
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('E');
+    zeta_tx_byte(en);
 }
 
 uint8_t zeta_get_rssi(void)
 {
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('Q');
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('Q');
 
-    spi_xfer(0x00); // '#'
-    spi_xfer(0x00); // 'Q'
-    uint8_t rssi = spi_xfer(0x00); // RSSI value.
-    spi_cs_high();
+    zeta_tx_byte(0x00); // '#'
+    zeta_tx_byte(0x00); // 'Q'
+    uint8_t rssi = zeta_rx_byte(); // RSSI value.
 
     return rssi;
 }
 
 void zeta_get_vers(void)
 {
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('V');
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('V');
 
-    uint8_t i;
-    for (i = 6; i > 0; i--) {
+    // Get version from radio
+    do {
         zeta_rx_byte();
-    }
-    spi_cs_high();
+    } while (!(P1IN & IRQ)); // Until there is no more data.
 }
 
 void zeta_get_settings(void)
 {
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('?');
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('?');
 
-    uint8_t i;
-    for (i = 10; i > 0; i--) {
+    // Get settings from radio
+    do {
         zeta_rx_byte();
-    }
-    spi_cs_high();
+    } while (!(P1IN & IRQ)); // Until there is no more data.
 }
 
 void zeta_reset_default(void)
 {
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('D');
-    spi_cs_high();
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('D');
 }
 
 void zeta_send_open(uint8_t ch, uint8_t pLength)
@@ -206,16 +186,15 @@ void zeta_send_open(uint8_t ch, uint8_t pLength)
         // Invalid arguments.
         return;
     }
-    spi_cs_low();
-    spi_xfer('A');
-    spi_xfer('T');
-    spi_xfer('S');
-    spi_xfer(ch);
-    spi_xfer(pLength);
-    // NOW CALL zeta_write_byte()
+    zeta_tx_byte('A');
+    zeta_tx_byte('T');
+    zeta_tx_byte('S');
+    zeta_tx_byte(ch);
+    zeta_tx_byte(pLength);
+    // NOW CALL zeta_tx_byte()
 }
 
-void zeta_write_byte(uint8_t data)
+void zeta_tx_byte(uint8_t data)
 {
     spi_xfer(data);
     // NOW CALL zeta_send_close()
@@ -223,9 +202,9 @@ void zeta_write_byte(uint8_t data)
 
 void zeta_send_close(void)
 {
-    /// @test Is this required?
-    __delay_cycles(48e4); // 48e4/24e6 = 0.020 // delay(20);
-    spi_cs_high();
+    /// @test Is this required? Test when comms are working!
+    __delay_cycles(2e4); // 2e4/1e6 = 0.020 // delay(20);
+//    spi_cs_high();
 }
 
 void zeta_send_packet(uint8_t packet[], uint8_t len)
@@ -233,35 +212,24 @@ void zeta_send_packet(uint8_t packet[], uint8_t len)
     zeta_send_open(CHANNEL, len);
     uint8_t i;
     for (i = 0; i < len; i++) {
-        zeta_write_byte(packet[i]);
+        zeta_tx_byte(packet[i]);
     }
     zeta_send_close();
 }
 
 uint8_t zeta_rx_byte(void)
 {
-//    zeta_wait_irq();
-    spi_cs_low();
-    uint8_t out = spi_xfer(0x00);
-    spi_cs_high();
-    return out;
+    return spi_xfer(0x00);
 }
 
 void zeta_rx_packet(uint8_t packet[])
 {
-    uint8_t count = 0;
+    uint8_t i = 0;
 
-    packet[0] = zeta_rx_byte(); // '#'
+    // Wait for nIRQ to show there is data.
     zeta_wait_irq();
-    packet[1] = zeta_rx_byte(); // 'R'
-    zeta_wait_irq();
-    packet[2] = count = zeta_rx_byte() - 4; // packet length
-    zeta_wait_irq();
-    packet[3] = zeta_rx_byte(); // RSSI
-
-    // subsequent bytes are message data
-    for (; count > 0; count--) {
-        zeta_wait_irq();
-        packet[4 + (4u - count)] = zeta_rx_byte();
-    }
+    // Get whole packet from FIFO.
+    do {
+        packet[i++] = zeta_rx_byte();
+    } while (!(P1IN & IRQ));
 }

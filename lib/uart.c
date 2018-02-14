@@ -9,9 +9,9 @@ void uart_init(void)
     // UART clock uses SMCLK.
     UCA1CTL1 |= UCSWRST;
     UCA1CTL1 = UCSSEL__SMCLK;
-    // 12MHz SMCLK, 115200 baud, UCOS16=1, UCBRx=6, UCBRFx=8, UCBRSx=0x20
-    UCA1MCTLW |= 0x2081;
-    UCA1BRW = 6;
+    // 1MHz SMCLK, 115200 baud, UCOS16=0, UCBRx=8, UCBRFx=-, UCBRSx=0xD6
+    UCA1MCTLW |= 0xD600;
+    UCA1BRW = 8;
     // Initialise eUSCI
     UCA1CTLW0 &= ~UCSWRST;
 }

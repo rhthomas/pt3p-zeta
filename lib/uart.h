@@ -23,9 +23,17 @@
 void uart_init(void);
 
 /**
+ * @defgroup debug Debug
+ * @brief Functions for debugging the system.
+ * @{
+ */
+
+/**
  * Print character over UART.
  *
  * @param ch : Character byte to print.
+ * @bug This is working (Saleae) but not on the serial line? Perhaps this is
+ * because I'm pulling the UART through the other MSP programmer?
  */
 void uart_putc(unsigned char ch);
 
@@ -35,5 +43,7 @@ void uart_putc(unsigned char ch);
  * @param string : Pointer to string to print.
  */
 void uart_puts(const char *string);
+
+/** @} */
 
 #endif // UART_H

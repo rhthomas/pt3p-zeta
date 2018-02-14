@@ -3,12 +3,13 @@
 void spi_init(void)
 {
     P1DIR |= (SCLK | CS);
-    spi_cs_high();
+    P1OUT |= CS;
     P2DIR |= MOSI;
     P2DIR &= ~MISO;
 
     // Secondary functionality of pins.
     P1SEL1 |= SCLK;
+    P1SEL1 |= CS;
     P2SEL1 |= (MOSI | MISO);
 
     UCA0CTLW0 |= UCSWRST; // reset state-machine
@@ -16,7 +17,8 @@ void spi_init(void)
      * 3-pin mode.
      * Synchronous mode.
      * MSB first. */
-    UCA0CTLW0 |= UCMST | UCSYNC | UCMSB | UCCKPH;
+    UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
+    UCA0CTLW0 |= (UCMODE1 | UCSTEM);
     UCA0CTLW0 |= UCSSEL__SMCLK; // SMCLK @ 1MHz
     UCA0MCTLW = 0; // No modulation.
     UCA0BRW = 0; // Run the SPI clk at 1MHz
@@ -33,12 +35,12 @@ uint8_t spi_xfer(uint8_t byte)
     return UCA0RXBUF;
 }
 
-void spi_cs_high(void)
-{
-    P1OUT |= CS;
-}
-
-void spi_cs_low(void)
-{
-    P1OUT &= ~CS;
-}
+//inline void spi_cs_high(void)
+//{
+//    P1OUT |= CS;
+//}
+//
+//inline void spi_cs_low(void)
+//{
+//    P1OUT &= ~CS;
+//}

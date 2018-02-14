@@ -25,13 +25,13 @@ void clock_init(void)
     CSCTL0_H = 0xA5;
     /// @bug DCO should be 8MHz but is 1MHz for some reason.
     CSCTL1 &= ~(DCORSEL);
-    CSCTL1 |= DCOFSEL0 | DCOFSEL1;
+    CSCTL1 |= (DCOFSEL0 | DCOFSEL1);
     // ACLK VLOCLK, SMCLK = MCLK = DCOCLK
-    CSCTL2 |= SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
+    CSCTL2 |= (SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK);
     // No clock prescales.
-    CSCTL3 |= DIVA__1 | DIVS__1 | DIVM__1;
+    CSCTL3 |= (DIVA__1 | DIVS__1 | DIVM__1);
     // Power down unused clocks.
-    CSCTL4 |= XT1OFF | XT2OFF;
+    CSCTL4 |= (XT1OFF | XT2OFF);
     // Lock the registers.
     CSCTL0_H = 0;
 }
@@ -39,7 +39,7 @@ void clock_init(void)
 void timer_init(void)
 {
     // ACLK, upmode, clear.
-    TA0CTL |= TASSEL__ACLK | MC_1;
+    TA0CTL |= (TASSEL__ACLK | MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-    TA0CCR0 = 0x2710; // ~1s delay.
+    TA0CCR0 = 0x2711; // ~1s delay.
 }

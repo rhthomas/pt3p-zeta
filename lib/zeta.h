@@ -189,14 +189,28 @@ void zeta_enable_crc(uint8_t en);
 uint8_t zeta_get_rssi(void);
 
 /**
+ * Get version of radio firmware.
  *
- * @bug Used for debugging the radio.
+ * @note To see output, attach Saleae.
+ * @ingroup debug
  */
 void zeta_get_vers(void);
 
 /**
+ * Get current radio configuration.
  *
- * @bug Used for debugging the radio.
+ * Returns `#?12345678` where:
+ * 1. Operating mode (Rx = 0, Ready = 1).
+ * 2. RF baud rate (1-6).
+ * 3. RF output power (1-127).
+ * 4. Sync byte 1.
+ * 5. Sync byte 2.
+ * 6. Sync byte 3.
+ * 7. Sync byte 4.
+ * 8. Channel number (0-15).
+ *
+ * @note To see output, attach Saleae.
+ * @ingroup debug
  */
 void zeta_get_settings(void);
 
@@ -228,7 +242,7 @@ void zeta_send_open(uint8_t ch, uint8_t pLength);
  *
  * @param data : Data byte to send.
  */
-void zeta_write_byte(uint8_t data);
+void zeta_tx_byte(uint8_t data);
 
 /**
  * Send packet closing.
