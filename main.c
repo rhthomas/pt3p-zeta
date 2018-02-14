@@ -28,6 +28,8 @@
 #include "uart.h" // Debugging
 #include "zeta.h" // Radio
 
+#define UB20 (BIT0) ///< UB20 interrupt comes from P4.0.
+
 uint8_t in_packet[PACKET_SIZE]; ///< Array for received data.
 
 /**
@@ -64,15 +66,15 @@ void main(void)
         // Put radio to sleep.
         zeta_select_mode(3);
         // Re-enable UB20 interrupt when finished.
-        P1IE = BIT3;
+        P4IE = UB20;
     }
 }
 
-#pragma vector=PORT1_VECTOR
-__interrupt void PORT1_ISR(void)
+#pragma vector=PORT4_VECTOR
+__interrupt void PORT4_ISR(void)
 {
-    P1IFG &= ~BIT3; // Clear P1.3 interrupt flag.
-    P1IE = 0; // Disable interrupts.
+    P4IFG &= ~UB20; // Clear P4.0 interrupt flag.
+    P4IE = 0; // Disable interrupts.
     /* This clears the LPM4 bits which puts the processor back into
      * active mode. When leaving the ISR, the code then continues from
      * after __bis_SR_register, of which contains the radio code (does

@@ -53,7 +53,7 @@ void main(void)
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void TIMER0_ISR(void)
 {
-    PJOUT ^= BIT0; // Toggle LED to show you're in ISR.
+//    PJOUT ^= BIT0; // Toggle LED to show you're in ISR.
     // Exit into active mode and disable interrupts while Tx'ing.
     __bic_SR_register_on_exit(LPM3_bits | GIE);
 }

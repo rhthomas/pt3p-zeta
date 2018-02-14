@@ -14,18 +14,20 @@ void io_init(void)
     PAIFG = 0;
     PBIFG = 0;
     /// @todo Setup UB20 interrupt on P1.3.
+
+    /// @test Set PJ pins as clock outputs.
+    PJSEL0 |= (BIT2 | BIT1 | BIT0);
 }
 
 void clock_init(void)
 {
     CSCTL0_H = 0xA5; // Unlock CS registers.
-    CSCTL1 |= DCORSEL | DCOFSEL0 | DCOFSEL1; // 24MHz
+    CSCTL1 &= ~(DCORSEL);
+    CSCTL1 |= DCOFSEL0 | DCOFSEL1; // 24MHz
     // ACLK = SMCLK = MCLK = DCOCLK
     CSCTL2 |= SELA_1 | SELS_3 | SELM_3;
     // SMCLK=DCO/2
-    CSCTL3 |= DIVA_0 | DIVS_1 | DIVM_0;
-    // Power down unused clocks.
-    CSCTL4 |= XT2OFF | XT1OFF;
+    CSCTL3 |= DIVA_0 | DIVS_0 | DIVM_0;
     CSCTL0_H = 0; // Lock the registers.
 }
 
