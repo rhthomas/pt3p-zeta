@@ -39,8 +39,9 @@ void main(void)
         // Go to sleep. Wait for timer interrupt.
         __bis_SR_register(LPM3_bits | GIE);
         // Send packet. Returns to previous state (sleep) when done.
-//        zeta_send_packet(msg, sizeof(msg));
-        zeta_get_vers();
+//        zeta_get_vers();
+//        zeta_get_settings();
+        zeta_send_packet(msg, sizeof(msg));
     }
 }
 
@@ -56,26 +57,4 @@ __interrupt void TIMER0_ISR(void)
     P3OUT ^= BIT7; // Toggle LED to show you're in ISR.
     // Exit into active mode and disable interrupts while Tx'ing.
     __bic_SR_register_on_exit(LPM3_bits | GIE);
-}
-
-/// @todo Write a better implementation than this.
-void Set_Binary_value(unsigned int v)
-{
-    PJOUT &= ~(BIT0);
-    PJOUT &= ~(BIT1);
-    PJOUT &= ~(BIT2);
-    PJOUT &= ~(BIT3);
-    P3OUT &= ~(BIT4);
-    P3OUT &= ~(BIT5);
-    P3OUT &= ~(BIT6);
-    P3OUT &= ~(BIT7);
-
-    PJOUT |= (BIT0 & (v & 0x0001));
-    PJOUT |= (BIT1 & (v & 0x0002));
-    PJOUT |= (BIT2 & (v & 0x0004));
-    PJOUT |= (BIT3 & (v & 0x0008));
-    P3OUT |= (BIT4 & (v & 0x0010));
-    P3OUT |= (BIT5 & (v & 0x0020));
-    P3OUT |= (BIT6 & (v & 0x0040));
-    P3OUT |= (BIT7 & (v & 0x0080));
 }

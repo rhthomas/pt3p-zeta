@@ -195,6 +195,12 @@ uint8_t zeta_get_rssi(void);
 void zeta_get_vers(void);
 
 /**
+ *
+ * @bug Used for debugging the radio.
+ */
+void zeta_get_settings(void);
+
+/**
  * Reset the radio to its power on defaults [ATD].
  */
 void zeta_reset_default(void);

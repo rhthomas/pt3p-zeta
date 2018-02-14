@@ -21,14 +21,19 @@ void io_init(void)
 
 void clock_init(void)
 {
-    CSCTL0_H = 0xA5; // Unlock CS registers.
+    // Unlock CS registers.
+    CSCTL0_H = 0xA5;
+    /// @bug DCO should be 8MHz but is 1MHz for some reason.
     CSCTL1 &= ~(DCORSEL);
-    CSCTL1 |= DCOFSEL0 | DCOFSEL1; // 24MHz
-    // ACLK = SMCLK = MCLK = DCOCLK
+    CSCTL1 |= DCOFSEL0 | DCOFSEL1;
+    // ACLK VLOCLK, SMCLK = MCLK = DCOCLK
     CSCTL2 |= SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
-    // SMCLK=DCO/2
+    // No clock prescales.
     CSCTL3 |= DIVA__1 | DIVS__1 | DIVM__1;
-    CSCTL0_H = 0; // Lock the registers.
+    // Power down unused clocks.
+    CSCTL4 |= XT1OFF | XT2OFF;
+    // Lock the registers.
+    CSCTL0_H = 0;
 }
 
 void timer_init(void)

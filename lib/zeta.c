@@ -27,6 +27,7 @@ void zeta_init(void)
     zeta_set_rf_power(127u);
     // Set standard sync bytes (not required).
     zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
+//    zeta_reset_default();
 }
 
 void zeta_wait_irq(void)
@@ -171,9 +172,20 @@ void zeta_get_vers(void)
 
     uint8_t i;
     for (i = 6; i > 0; i--) {
-//        spi_cs_low();
-//        spi_xfer(0); // '#' '1' '.' '0' '1'
-//        spi_cs_high();
+        zeta_rx_byte();
+    }
+    spi_cs_high();
+}
+
+void zeta_get_settings(void)
+{
+    spi_cs_low();
+    spi_xfer('A');
+    spi_xfer('T');
+    spi_xfer('?');
+
+    uint8_t i;
+    for (i = 10; i > 0; i--) {
         zeta_rx_byte();
     }
     spi_cs_high();
