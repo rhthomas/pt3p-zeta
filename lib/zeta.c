@@ -165,13 +165,16 @@ uint8_t zeta_get_rssi(void)
 void zeta_get_vers(void)
 {
     spi_cs_low();
-    spi_xfer(65);
-    spi_xfer(84);
-    spi_xfer(86);
+    spi_xfer('A');
+    spi_xfer('T');
+    spi_xfer('V');
 
     uint8_t i;
     for (i = 6; i > 0; i--) {
-        spi_xfer(0); // '#' '1' '.' '0' '1'
+//        spi_cs_low();
+//        spi_xfer(0); // '#' '1' '.' '0' '1'
+//        spi_cs_high();
+        zeta_rx_byte();
     }
     spi_cs_high();
 }
@@ -225,7 +228,7 @@ void zeta_send_packet(uint8_t packet[], uint8_t len)
 
 uint8_t zeta_rx_byte(void)
 {
-    zeta_wait_irq();
+//    zeta_wait_irq();
     spi_cs_low();
     uint8_t out = spi_xfer(0x00);
     spi_cs_high();
@@ -237,12 +240,16 @@ void zeta_rx_packet(uint8_t packet[])
     uint8_t count = 0;
 
     packet[0] = zeta_rx_byte(); // '#'
+    zeta_wait_irq();
     packet[1] = zeta_rx_byte(); // 'R'
+    zeta_wait_irq();
     packet[2] = count = zeta_rx_byte() - 4; // packet length
+    zeta_wait_irq();
     packet[3] = zeta_rx_byte(); // RSSI
 
     // subsequent bytes are message data
     for (; count > 0; count--) {
+        zeta_wait_irq();
         packet[4 + (4u - count)] = zeta_rx_byte();
     }
 }

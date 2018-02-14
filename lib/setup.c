@@ -25,9 +25,9 @@ void clock_init(void)
     CSCTL1 &= ~(DCORSEL);
     CSCTL1 |= DCOFSEL0 | DCOFSEL1; // 24MHz
     // ACLK = SMCLK = MCLK = DCOCLK
-    CSCTL2 |= SELA_1 | SELS_3 | SELM_3;
+    CSCTL2 |= SELA__VLOCLK | SELS__DCOCLK | SELM__DCOCLK;
     // SMCLK=DCO/2
-    CSCTL3 |= DIVA_0 | DIVS_0 | DIVM_0;
+    CSCTL3 |= DIVA__1 | DIVS__1 | DIVM__1;
     CSCTL0_H = 0; // Lock the registers.
 }
 

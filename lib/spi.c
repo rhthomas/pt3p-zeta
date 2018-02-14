@@ -16,10 +16,10 @@ void spi_init(void)
      * 3-pin mode.
      * Synchronous mode.
      * MSB first. */
-    UCA0CTLW0 |= UCMST | UCSYNC | UCMSB;
-    UCA0CTLW0 |= UCSSEL__SMCLK; // SMCLK @ 12MHz
+    UCA0CTLW0 |= UCMST | UCSYNC | UCMSB | UCCKPH;
+    UCA0CTLW0 |= UCSSEL__SMCLK; // SMCLK @ 1MHz
     UCA0MCTLW = 0; // No modulation.
-    UCA0BRW = 0x000b; // Run the SPI clk at 1MHz
+    UCA0BRW = 0; // Run the SPI clk at 1MHz
     UCA0CTLW0 &= ~UCSWRST; // initialise the state-machine
 }
 
