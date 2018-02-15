@@ -18,15 +18,15 @@ void spi_init(void)
      * 3-pin mode.
      * Synchronous mode.
      * MSB first. */
-    UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
+    UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB);// | UCCKPH);
     // Use USCA0STE pin as chip select.
     UCA0CTLW0 |= (UCMODE1 | UCSTEM);
     // SMCLK drives SPI peripheral.
     UCA0CTLW0 |= UCSSEL_2;
     // No modulation.
     UCA0MCTLW = 0;
-    // Run the SPI clk at 500kHz.
-    UCA0BRW = 0x0002;
+    // Run the SPI clk at 1MHz.
+    UCA0BRW = 0x0001;
     // initialise the state-machine
     UCA0CTLW0 &= ~UCSWRST;
 }
