@@ -22,7 +22,7 @@ void spi_init(void)
      * 5. UCA0STE (P1.4) as CS pin.
      * 6. Active low.
      * 7. SMCLK as source. */
-    UCA0CTLW0 |= (UCMST /*| UCSYNC*/| UCMSB | UCCKPH);
+    UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
 //    UCA0CTLW0 |= (UCMODE1 | UCSTEM);
     UCA0CTLW0 |= UCSSEL_2;
     // No modulation.
