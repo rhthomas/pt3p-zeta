@@ -23,22 +23,19 @@ void zeta_init(void)
 
     // digitalWrite(SDN, LOW);
     P3OUT &= ~SDN; // hold device in wake state
-//
-//    spi_cs_high();
 
     // Wait for CODEC to be ready for commands.
     zeta_ready();
 
-    __delay_cycles(6e5); // 600ms
-
     // Set host/rf baud rate.
-    zeta_set_baud_host(4u);
-    zeta_set_baud_rf(6u);
+    /// @bug Might not be in v1.01
+//    zeta_set_baud_host(4u);
+//    zeta_set_baud_rf(6u);
+//    __delay_cycles(15e3); // Takes 15ms to complete.
     // Max. TX power.
     zeta_set_rf_power(127u);
-    // Set standard sync bytes (not required).
+//     Set standard sync bytes (not required).
     zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
-//    zeta_reset_default();
 }
 
 void zeta_wait_irq(void)
@@ -117,7 +114,8 @@ void zeta_set_baud_rf(uint8_t baud)
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P3OUT |= SDN; // digitalWrite(SDN, HIGH);
-    __delay_cycles(2e4); // 2e4/1e6 = 0.020s // delay(20);
+    __delay_cycles(100);
+//    __delay_cycles(2e4); // 2e4/1e6 = 0.020s // delay(20);
     P3OUT &= ~SDN; // digitalWrite(SDN, LOW);
 }
 

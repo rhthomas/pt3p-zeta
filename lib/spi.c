@@ -34,13 +34,3 @@ uint8_t spi_xfer(uint8_t byte)
         ; // Wait until Rx buffer is ready.
     return UCA0RXBUF;
 }
-
-//inline void spi_cs_high(void)
-//{
-//    P1OUT |= CS;
-//}
-//
-//inline void spi_cs_low(void)
-//{
-//    P1OUT &= ~CS;
-//}

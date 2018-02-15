@@ -46,7 +46,4 @@ void spi_init(void);
  */
 uint8_t spi_xfer(uint8_t byte);
 
-//inline void spi_cs_high(void);
-//inline void spi_cs_low(void);
-
 #endif // SPI_H

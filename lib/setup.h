@@ -35,6 +35,8 @@ void io_init(void);
  * | MCLK  | DCO    | 24MHz |
  * | SMCLK | DCO    | 12MHz |
  * | ACLK  | DCO    | 10kHz |
+ *
+ * @bug Clocks are being weird.
  */
 void clock_init(void);
 

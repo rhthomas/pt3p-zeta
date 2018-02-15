@@ -15,15 +15,13 @@ uint8_t msg[12u] = {
     0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
     0xAA};
 
-void Set_Binary_value(unsigned int v);
-
 /**
  * Main loop.
  */
 void main(void)
 {
     // Stop watchdog timer.
-    WDTCTL = (WDTPW | WDTHOLD);
+    WDTCTL = WDTPW + WDTHOLD;
 
     // Setup peripherals.
     io_init();
@@ -31,6 +29,7 @@ void main(void)
     timer_init();
     spi_init();
     zeta_init();
+    __delay_cycles(20e3);
 
     zeta_select_mode(2u);
 

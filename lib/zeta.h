@@ -220,7 +220,7 @@ void zeta_get_vers(void);
  * Get current radio configuration.
  *
  * Returns `#?12345678` where:
- * 1. Operating mode (Rx = 0, Ready = 1).
+ * 1. Operating mode (Rx = 1, Ready = 2).
  * 2. RF baud rate (1-6).
  * 3. RF output power (1-127).
  * 4. Sync byte 1.
