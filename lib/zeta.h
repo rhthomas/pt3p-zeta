@@ -61,7 +61,7 @@
  * Called within zeta_sync_byte().
  *
  * @param byte : Byte to flip.
- * @return Reverse byte.
+ * @return Reversed byte.
  * @see zeta_sync_byte()
  */
 uint8_t reverse(uint8_t byte);
@@ -99,6 +99,7 @@ void zeta_ready(void);
 /**
  * @defgroup config Radio Configuration
  * @brief Functions to configure the radio settings (i.e. channel, mode etc).
+ * @note All configuration functions end with a 20ms delay.
  * @{
  */
 
@@ -255,7 +256,7 @@ void zeta_send_open(uint8_t ch, uint8_t pLength);
  *
  * @param data : Data byte to send.
  */
-void zeta_tx_byte(uint8_t data);
+void zeta_write_byte(uint8_t data);
 
 /**
  * Send packet closing.
@@ -283,7 +284,7 @@ void zeta_send_packet(uint8_t packet[], uint8_t len);
  *
  * @return Byte from the FIFO buffer.
  */
-uint8_t zeta_rx_byte(void);
+uint8_t zeta_read_byte(void);
 
 /**
  * Read packet from FIFO loop until empty.

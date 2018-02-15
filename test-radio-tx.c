@@ -29,7 +29,6 @@ void main(void)
     timer_init();
     spi_init();
     zeta_init();
-    __delay_cycles(20e3);
 
     zeta_select_mode(2u);
 

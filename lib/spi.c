@@ -12,17 +12,23 @@ void spi_init(void)
     P1SEL1 |= CS;
     P2SEL1 |= (MOSI | MISO);
 
-    UCA0CTLW0 |= UCSWRST; // reset state-machine
+    // Reset state-machine.
+    UCA0CTLW0 |= UCSWRST;
     /* Master mode.
      * 3-pin mode.
      * Synchronous mode.
      * MSB first. */
     UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
+    // Use USCA0STE pin as chip select.
     UCA0CTLW0 |= (UCMODE1 | UCSTEM);
-    UCA0CTLW0 |= UCSSEL__SMCLK; // SMCLK @ 1MHz
-    UCA0MCTLW = 0; // No modulation.
-    UCA0BRW = 0; // Run the SPI clk at 1MHz
-    UCA0CTLW0 &= ~UCSWRST; // initialise the state-machine
+    // SMCLK drives SPI peripheral.
+    UCA0CTLW0 |= UCSSEL_2;
+    // No modulation.
+    UCA0MCTLW = 0;
+    // Run the SPI clk at 500kHz.
+    UCA0BRW = 0x0002;
+    // initialise the state-machine
+    UCA0CTLW0 &= ~UCSWRST;
 }
 
 uint8_t spi_xfer(uint8_t byte)

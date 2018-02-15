@@ -41,7 +41,7 @@ void io_init(void);
 void clock_init(void);
 
 /**
- * Setup time for periodic transmissions.
+ * Setup timer for periodic transmissions.
  */
 void timer_init(void);
 

@@ -25,7 +25,7 @@ void clock_init(void)
     CSCTL0_H = 0xA5;
     // Set DCO to 8MHz.
     CSCTL1 |= DCOFSEL0 + DCOFSEL1;
-    // ACLK = SMCLK = MCLK = DCO
+    // ACLK = VLO, SMCLK = MCLK = DCO
     CSCTL2 = SELA_1 + SELS_3 + SELM_3;
     // ACLK/1, SMCLK/8, MCLK/1
     CSCTL3 = DIVA_0 + DIVS_3 + DIVM_0; // set all dividers
