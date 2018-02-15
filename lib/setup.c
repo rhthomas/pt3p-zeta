@@ -28,9 +28,11 @@ void clock_init(void)
     // ACLK = VLO, SMCLK = MCLK = DCO
     CSCTL2 = SELA_1 + SELS_3 + SELM_3;
     // ACLK/1, SMCLK/8, MCLK/1
-    CSCTL3 = DIVA_0 + DIVS_3 + DIVM_0; // set all dividers
+    CSCTL3 = DIVA_0 + DIVS_3 + DIVM_0;
     // Power down unused clocks.
     CSCTL4 = XT1OFF + XT2OFF;
+    // Lock clock registers.
+    CSCTL0_H = 0;
 }
 
 void timer_init(void)

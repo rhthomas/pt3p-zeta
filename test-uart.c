@@ -23,7 +23,8 @@ void main(void)
 
     while (1) {
         __bis_SR_register(GIE);
-        uart_putc('R');
-        __delay_cycles(2400000); // ~1s delay
+        uart_puts("Hello");
+        P3OUT ^= BIT7;
+        __delay_cycles(8e6); // ~1s delay
     }
 }

@@ -27,8 +27,8 @@ void spi_init(void)
     UCA0CTLW0 |= UCSSEL_2;
     // No modulation.
     UCA0MCTLW = 0;
-    // Run the SPI clk at 500kHz.
-    UCA0BRW = 0x0002;
+    // Run the SPI clk at 1MHz.
+    UCA0BRW = 0x0001;
     // initialise the state-machine
     UCA0CTLW0 &= ~UCSWRST;
 }
