@@ -34,9 +34,9 @@ void main(void)
         // Go to sleep. Wait for timer interrupt.
         __bis_SR_register(LPM3_bits | GIE);
         // Send packet. Returns to previous state (sleep) when done.
-//        zeta_get_vers();
+        zeta_get_vers();
 //        zeta_get_settings();
-        zeta_send_packet(msg, sizeof(msg));
+//        zeta_send_packet(msg, sizeof(msg));
     }
 }
 

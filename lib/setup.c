@@ -40,6 +40,6 @@ void timer_init(void)
     // ACLK, upmode, clear.
     TA0CTL |= (TASSEL__ACLK | MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-//    TA0CCR0 = 0x2711; // ~1s delay.
-    TA0CCR0 = 0x1389; // ~0.5s delay.
+    TA0CCR0 = 0x2711; // ~1s delay.
+//    TA0CCR0 = 0x1389; // ~0.5s delay.
 }
