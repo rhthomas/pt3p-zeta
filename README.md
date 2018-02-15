@@ -48,7 +48,7 @@ the required registers on the Si4455 radio, from Silicon Labs.
 ### The Directories
 
 * `lib/` - Contains the library files of the implementation.
-    * `setup` - Used to setup periperals such as clocks/timers/pins etc.
+    * `setup` - Used to setup peripherals such as clocks/timers/pins etc.
     for the MSP430FR5793.
     * `spi` - Contains the SPI initialisation and transfer functions.
     * `uart` - Contains the UART initialisation and print functions for
@@ -68,5 +68,5 @@ work in progress.**
 ## The Documentation
 
 The library used in this project is documented with Doxygen style comments. The
-compiled doxygen is not yet live online, but the link will reside
-[here](rhthomas.github.io/docs/zeta) when it is released.
+compiled Doxygen is not yet live online, but the link will reside
+[here](https://rhthomas.github.io/docs/zeta) when it is released.
