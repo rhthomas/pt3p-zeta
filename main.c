@@ -70,14 +70,21 @@ void main(void)
     }
 }
 
+/**
+ * ISR that is triggered by UB20.
+ *
+ * Used for waking up the processor, this ISR clears the LPM4 bits which puts
+ * the processor back into active mode. When leaving the ISR, the code then
+ * continues from after __bis_SR_register, of which contains the radio code
+ * (does the talking/listening).
+ */
 #pragma vector=PORT4_VECTOR
 __interrupt void PORT4_ISR(void)
 {
-    P4IFG &= ~UB20; // Clear P4.0 interrupt flag.
-    P4IE = 0; // Disable interrupts.
-    /* This clears the LPM4 bits which puts the processor back into
-     * active mode. When leaving the ISR, the code then continues from
-     * after __bis_SR_register, of which contains the radio code (does
-     * the talking). */
+    // Clear P4.0 interrupt flag.
+    P4IFG &= ~UB20;
+    // Disable interrupts.
+    P4IE = 0;
+    // Clear LPM4 bits on exit from ISR.
     __bic_SR_register_on_exit(LPM4_bits);
 }
