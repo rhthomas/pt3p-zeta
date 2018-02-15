@@ -10,10 +10,7 @@
 #include "setup.h" // System setup functions
 #include "zeta.h" // Radio
 
-///< Dummy test packet to send, 12-bytes of 0b10101010.
-uint8_t msg[12u] = {
-    0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0xAA,
-    0xAA};
+uint8_t msg[] = {'H', 'E', 'L', 'L', 'O'};
 
 /**
  * Main loop.
@@ -37,9 +34,9 @@ void main(void)
         // Go to sleep. Wait for timer interrupt.
         __bis_SR_register(LPM3_bits | GIE);
         // Send packet. Returns to previous state (sleep) when done.
-        zeta_get_vers();
-        zeta_get_settings();
-//        zeta_send_packet(msg, sizeof(msg));
+//        zeta_get_vers();
+//        zeta_get_settings();
+        zeta_send_packet(msg, sizeof(msg));
     }
 }
 

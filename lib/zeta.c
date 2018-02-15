@@ -29,10 +29,10 @@ void zeta_init(void)
     zeta_ready();
 
     /* Configure device:
-     * Max. transmit power.
-     * 0xAA sync bytes (unused).
-     * Host baud rate 4.
-     * RF baud rate 6.
+     * 1. Max. transmit power.
+     * 2. 0xAA sync bytes (unused).
+     * 3. Host baud rate 4.
+     * 4. RF baud rate 6.
      */
     zeta_set_rf_power(127u);
     zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
@@ -53,6 +53,10 @@ void zeta_ready(void)
     while (!(P1IN & IRQ))
         ;
 }
+
+//--------------------------------------
+// CONFIG
+//--------------------------------------
 
 void zeta_select_mode(uint8_t mode)
 {
@@ -167,6 +171,10 @@ void zeta_reset_default(void)
     __delay_cycles(1.6e5); // delay 20ms
 }
 
+//--------------------------------------
+// DEBUG
+//--------------------------------------
+
 uint8_t zeta_get_rssi(void)
 {
     zeta_write_byte('A');
@@ -201,6 +209,10 @@ void zeta_get_settings(void)
         zeta_read_byte();
     } while (!(P1IN & IRQ)); // Until there is no more data.
 }
+
+//--------------------------------------
+// TX
+//--------------------------------------
 
 void zeta_send_open(uint8_t ch, uint8_t pLength)
 {
@@ -238,6 +250,10 @@ void zeta_send_packet(uint8_t packet[], uint8_t len)
     }
     zeta_send_close();
 }
+
+//--------------------------------------
+// RX
+//--------------------------------------
 
 uint8_t zeta_read_byte(void)
 {

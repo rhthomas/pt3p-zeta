@@ -13,9 +13,9 @@ void io_init(void)
     // Reset interrupt flags.
     PAIFG = 0;
     PBIFG = 0;
-    /// @todo Setup UB20 interrupt on P1.3.
+    /// @todo Setup UB20 interrupt on P4.0.
 
-    /// @test Set PJ pins as clock outputs.
+    // Set PJ pins as clock outputs.
     PJSEL0 |= (BIT2 | BIT1 | BIT0);
 }
 
@@ -38,5 +38,6 @@ void timer_init(void)
     // ACLK, upmode, clear.
     TA0CTL |= (TASSEL__ACLK | MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-    TA0CCR0 = 0x2711; // ~1s delay.
+//    TA0CCR0 = 0x2711; // ~1s delay.
+    TA0CCR0 = 0x1389; // ~0.5s delay.
 }

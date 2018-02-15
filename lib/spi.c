@@ -14,14 +14,16 @@ void spi_init(void)
 
     // Reset state-machine.
     UCA0CTLW0 |= UCSWRST;
-    /* Master mode.
-     * 3-pin mode.
-     * Synchronous mode.
-     * MSB first. */
+    /* SPI configuration:
+     * 1. Master 3-pin mode.
+     * 2. Synchronous.
+     * 3. MSB first.
+     * 4. Clock polarity.
+     * 5. UCA0STE (P1.4) as CS pin.
+     * 6. Active low.
+     * 7. SMCLK as source. */
     UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
-    // Use USCA0STE pin as chip select.
     UCA0CTLW0 |= (UCMODE1 | UCSTEM);
-    // SMCLK drives SPI peripheral.
     UCA0CTLW0 |= UCSSEL_2;
     // No modulation.
     UCA0MCTLW = 0;
