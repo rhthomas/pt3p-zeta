@@ -18,7 +18,7 @@ technology with low power operation and non-volatile memory.
 
 ## The Platform
 
-### The MCU
+### Micro-controller
 
 The micro-controller of choice is the MSP430FR5739 from Texas Instruments. This
 is due to its low power consumption and integrated non-volatile FRAM memory. The
@@ -26,18 +26,18 @@ intention for the final solution is that the received data will be stored in NVM
 until the supply is sufficient to handle the data. Hence after a SPI transfer
 from the radio, the data will be written to FRAM and the MCU will sleep.
 
-### The Radio
+### RF Radio
 
 The radio that will be used - and hence the repo is for - is the ZETAPLUS module
 from RF solutions. This comes with a CODEC chip for simple SPI/UART
 communications and a very low power sleep state. The actual radio part of the
 module is the Si4455 from Silicon labs.
 
-### The Method of Wake-Up
+### Wake-up Trigger
 
 `// TODO Write this.`
 
-## The Repo
+## The Repository
 
 This repository contains the code necessary for driving the ZETAPLUS radio that
 I have chosen as the communications method for this project. Onboard the module
@@ -45,7 +45,7 @@ there is a CODEC chip which decodes simple
 [*Hayes commands*](https://en.wikipedia.org/wiki/Hayes_command_set) in order set
 the required registers on the Si4455 radio, from Silicon Labs.
 
-### The Directories
+### Directory Structure
 
 * `lib/` - Contains the library files of the implementation.
     * `setup` - Used to setup peripherals such as clocks/timers/pins etc.
@@ -65,8 +65,25 @@ tested and work as expected.
 * `test-radio-tx.c` - Test transmitting packets from radio module. **Currently
 work in progress.**
 
-## The Documentation
+## Documentation
 
 The library used in this project is documented with Doxygen style comments. The
 compiled Doxygen is not yet live online, but the link will reside
 [here](https://rhthomas.github.io/docs/zeta) when it is released.
+
+## TODO
+
+- [x] Write libraries.
+	- [x] UART
+	- [x] SPI
+	- [x] ZETAPLUS
+- [x] Configure radio with libraries (i.e. set RF baud and sync bytes).
+- [ ] Get transmission working.
+- [ ] Receive packet over RF.
+- [ ] Wake-up node over RF with UB20.
+- [ ] Write unified `main.c` program.
+	- [ ] Incorporate Hibernus.
+		- [ ] Remove clashes with clock/pin initialisation.
+	- [ ] Incorporate RESTOP.
+- [ ] Optimise code (more ISRs and use DMA).
+
