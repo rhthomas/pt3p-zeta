@@ -79,6 +79,7 @@ uint8_t reverse(uint8_t byte);
  * @ingroup init
  * @note SPI initialisation function must be called before initialising the
  * radio.
+ * @see spi_init()
  */
 void zeta_init(void);
 
@@ -100,6 +101,7 @@ void zeta_ready(void);
  * @defgroup config Radio Configuration
  * @brief Functions to configure the radio settings (i.e. channel, mode etc).
  * @note All configuration functions end with a 20ms delay.
+ * @test Whats the shortest delay we can have?
  * @{
  */
 
@@ -175,7 +177,7 @@ void zeta_set_baud_rf(uint8_t baud);
  *
  * @param pwr : RF TX output power (1-127).
  * @note Not a linear function. The output power varies depending on factors
- * such as supply voltage, impedance miss-match etc. Adjustment resoulution of
+ * such as supply voltage, impedance miss-match etc. Adjustment resolution of
  * the TX output power is very fine (step size < 0.1dB) when operating near
  * max. power setting, but becomes coarser as output level is reduced.
  */
@@ -212,7 +214,7 @@ uint8_t zeta_get_rssi(void);
  * Get version of radio firmware.
  *
  * @note To see output, attach Saleae.
- * @bug Potential race condition with !(P1IN & IRQ) poll.
+ * @warning Potential race condition with !(P1IN & IRQ) poll.
  * @ingroup debug
  */
 void zeta_get_vers(void);
@@ -247,7 +249,6 @@ void zeta_get_settings(void);
  * @param ch : Channel to transmit on.
  * @param pLength : Length of packet.
  * @see CHANNEL.
- * @see PACKET_SIZE.
  */
 void zeta_send_open(uint8_t ch, uint8_t pLength);
 

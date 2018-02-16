@@ -23,8 +23,8 @@ void clock_init(void)
 {
     // Unlock CS registers.
     CSCTL0_H = 0xA5;
-    // Set DCO to 8MHz.
-    CSCTL1 |= DCOFSEL0 + DCOFSEL1;
+    // Set DCO to 24MHz.
+    CSCTL1 |= DCORSEL + DCOFSEL0 + DCOFSEL1;
     // ACLK = VLO, SMCLK = MCLK = DCO
     CSCTL2 = SELA_1 + SELS_3 + SELM_3;
     // ACLK/1, SMCLK/8, MCLK/1

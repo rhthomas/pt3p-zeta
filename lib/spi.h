@@ -34,7 +34,15 @@
 /**
  * Initialises the SPI peripheral on eUSCI A0.
  *
+ * SPI configuration:
+ * 1. Master 3-pin mode (CS is handled manually).
+ * 2. Synchronous.
+ * 3. MSB first.
+ * 4. Data captured on first clock edge and changed on following.
+ * 5. SMCLK @ 1MHz as source.
+ *
  * @ingroup init
+ * @note ZETAPLUS has a max. SPI frequency of 1.4MHz.
  */
 void spi_init(void);
 

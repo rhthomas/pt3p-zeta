@@ -33,7 +33,7 @@ void io_init(void);
  * | Clock | Module | Freq. |
  * |-------|--------|-------|
  * | MCLK  | DCO    | 24MHz |
- * | SMCLK | DCO    | 12MHz |
+ * | SMCLK | DCO    | 3MHz  |
  * | ACLK  | DCO    | 10kHz |
  *
  * @bug Clocks are being weird.

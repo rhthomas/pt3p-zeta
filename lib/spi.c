@@ -19,16 +19,16 @@ void spi_init(void)
      * 2. Synchronous.
      * 3. MSB first.
      * 4. Data captured on first clock edge and changed on following.
-     * 5. UCA0STE (P1.4) as CS pin.
-     * 6. Active low.
-     * 7. SMCLK as source. */
+     * x. UCA0STE (P1.4) as CS pin. (not used, now manual)
+     * x. Active low. (not used, now manual)
+     * 5. SMCLK as source. */
     UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
 //    UCA0CTLW0 |= (UCMODE1 | UCSTEM);
     UCA0CTLW0 |= UCSSEL_2;
     // No modulation.
     UCA0MCTLW = 0;
     // Run the SPI clk at 1MHz.
-    UCA0BRW_L = 1;
+    UCA0BRW_L = 3;
     // initialise the state-machine
     UCA0CTLW0 &= ~UCSWRST;
 }
