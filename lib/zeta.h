@@ -290,6 +290,12 @@ uint8_t zeta_read_byte(void);
 /**
  * Read packet from FIFO loop until empty.
  *
+ * '#'
+ * 'R'
+ * <RSSI>
+ * <Length>
+ * <... Packet ...>
+ *
  * @param[out] packet : Array to return Rx'd packet to.
  * @test Confirm that this works as expected.
  * @note Call zeta_wait_irq() after each Rx'd packet.

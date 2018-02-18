@@ -11,7 +11,7 @@
 #include "uart.h" // Debugging
 #include "zeta.h" // Radio
 
-uint8_t in_packet[12u]; ///< Array for received data.
+uint8_t in_packet[5u + 4u]; ///< Array for received data.
 uint8_t count;
 
 /**
@@ -25,23 +25,22 @@ void main(void)
     // Setup peripherals.
     io_init();
     clock_init();
-    timer_init();
     uart_init();
     spi_init();
-//    zeta_init();
+    zeta_init();
 
     // Main loop.
     while (1) {
         // Set Rx mode.
         zeta_select_mode(1);
         // Operating on channel 0 with packet size of 12 bytes.
-        zeta_rx_mode(CHANNEL, 12u);
+        zeta_rx_mode(CHANNEL, 5u + 4u);
         // Get incoming packet.
         zeta_rx_packet(in_packet);
         // Short delay after Rx'ing packet.
         __delay_cycles(48e4); // ~0.020s
         // Print packet contents to terminal.
-        for (count = 0; count < 12u; count++) {
+        for (count = 0; count < (5u + 4u); count++) {
             uart_putc(in_packet[count]);
         }
     }
