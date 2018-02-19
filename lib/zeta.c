@@ -247,7 +247,7 @@ void zeta_send_open(uint8_t ch, uint8_t pLength)
     zeta_write_byte('T');
     zeta_write_byte('S');
     zeta_write_byte(ch);
-    zeta_write_byte(pLength);
+    zeta_write_byte(pLength + 4u);
     // NOW CALL zeta_write_byte()
 }
 
