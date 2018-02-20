@@ -25,7 +25,7 @@ void zeta_init(void)
     P3OUT &= ~SDN; // hold device in wake state
 
     // Wait for CODEC to be ready for commands.
-    __delay_cycles(8e5); // delay 100ms
+    __delay_cycles(2.4e6); // delay 100ms
     zeta_ready();
 
     /* Configure device:
@@ -71,7 +71,7 @@ void zeta_select_mode(uint8_t mode)
     zeta_write_byte(mode);
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_rx_mode(uint8_t ch, uint8_t pLength)
@@ -88,7 +88,7 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength)
     zeta_write_byte(pLength);
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
@@ -104,7 +104,7 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
     zeta_write_byte(reverse(sync4));
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_baud_host(uint8_t baud)
@@ -120,7 +120,7 @@ void zeta_set_baud_host(uint8_t baud)
     zeta_write_byte(baud);
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_baud_rf(uint8_t baud)
@@ -141,7 +141,7 @@ void zeta_set_baud_rf(uint8_t baud)
     __delay_cycles(1.6e5); // delay(20);
     P3OUT &= ~SDN; // digitalWrite(SDN, LOW);
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_rf_power(uint8_t pwr)
@@ -157,7 +157,7 @@ void zeta_set_rf_power(uint8_t pwr)
     zeta_write_byte(pwr);
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_enable_crc(uint8_t en)
@@ -173,7 +173,7 @@ void zeta_enable_crc(uint8_t en)
     zeta_write_byte(en);
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_reset_default(void)
@@ -184,7 +184,7 @@ void zeta_reset_default(void)
     zeta_write_byte('D');
     spi_cs_high();
 
-    __delay_cycles(1.6e5); // delay 20ms
+    __delay_cycles(4.8e5); // delay 20ms
 }
 
 //--------------------------------------
