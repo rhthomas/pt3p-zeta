@@ -18,6 +18,7 @@ uint8_t msg[5u] = {'H', 'E', 'L', 'L', 'O'};
 void main(void)
 {
     // Stop watchdog timer.
+
     WDTCTL = WDTPW + WDTHOLD;
 
     // Setup peripherals.
@@ -36,7 +37,7 @@ void main(void)
         // Send packet. Returns to previous state (sleep) when done.
 //        zeta_get_vers();
         zeta_get_settings();
-//        zeta_send_packet(msg, sizeof(msg));
+        zeta_send_packet(msg, sizeof(msg));
     }
 }
 

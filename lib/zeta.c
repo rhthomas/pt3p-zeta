@@ -138,7 +138,7 @@ void zeta_set_baud_rf(uint8_t baud)
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P3OUT |= SDN; // digitalWrite(SDN, HIGH);
-    __delay_cycles(1.6e5); // delay(20);
+    __delay_cycles(4.8e5); // delay(20);
     P3OUT &= ~SDN; // digitalWrite(SDN, LOW);
 
     __delay_cycles(4.8e5); // delay 20ms
@@ -261,7 +261,7 @@ void zeta_send_close(void)
 {
     spi_cs_high();
     // cycles = MCLK * delay(s)
-    __delay_cycles(1.6e5); // delay(20);
+    __delay_cycles(4.8e5); // delay(20);
 }
 
 void zeta_send_packet(uint8_t packet[], uint8_t len)
