@@ -8,15 +8,14 @@
  * @details Pin-out:
  * ```
  * MSP430FR5739
- * -------+
+ * –––––––+
  *        |
- *    P2.0|-> Data Out (UCA0SIMO)
- *    P2.1|<- Data In (UCA0SOMI)
+ *    P1.3|-> CS (UCB0STE)
+ *    P1.6|-> Data Out (UCB0SIMO)
+ *    P1.7|<- Data In (UCB0SOMI)
+ *    P2.2|-> Serial Clock Out (UCB0CLK)
  *        |
- *    P1.4|-> CS (UCA0STE)
- *    P1.5|-> Serial Clock Out (UCA0CLK)
- *        |
- * -------+
+ * –––––––+
  * ```
  */
 

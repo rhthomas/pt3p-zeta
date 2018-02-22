@@ -18,6 +18,8 @@ technology with low power operation and non-volatile memory.
 
 ## The Platform
 
+![Pinout diagram](./pinout.png)
+
 ### Micro-controller
 
 The micro-controller of choice is the MSP430FR5739 from Texas Instruments. This
@@ -25,6 +27,10 @@ is due to its low power consumption and integrated non-volatile FRAM memory. The
 intention for the final solution is that the received data will be stored in NVM
 until the supply is sufficient to handle the data. Hence after a SPI transfer
 from the radio, the data will be written to FRAM and the MCU will sleep.
+
+### Supply Monitoring
+
+`// TODO Write this.`
 
 ### RF Radio
 
@@ -49,27 +55,27 @@ the required registers on the Si4455 radio, from Silicon Labs.
 
 * `lib/` - Contains the library files of the implementation.
     * `setup` - Used to setup peripherals such as clocks/timers/pins etc.
-    for the MSP430FR5793.
+      for the MSP430FR5793.
     * `spi` - Contains the SPI initialisation and transfer functions.
     * `uart` - Contains the UART initialisation and print functions for
-    debugging.
+      debugging.
     * `zeta` - This holds the main library functions for interfacing with the
     radio module.
 * `LICENSE` - Here is the copyright licenses of any other software that is used
-in this project (although it may not be included in the repo).
+  in this project (although it may not be included in the repo).
 * `README.md` - This file.
 * `main.c` - Combined main file which will demonstrate the proposed solution to
-the project. This will receive few updates until all other modules have been
-tested and work as expected.
-* `test-radio-rx.c` - Test receiving packets from radio module.
+  the project. This will receive few updates until all other modules have been
+  tested and work as expected.
+* `test-radio-rx.c` - Test receiving packets from radio module. **Currently
+  work in progress.**
 * `test-radio-tx.c` - Test transmitting packets from radio module. **Currently
-work in progress.**
+  work in progress.**
 
 ## Documentation
 
 The library used in this project is documented with Doxygen style comments. The
-compiled Doxygen is not yet live online, but the link will reside
-[here](https://rhthomas.github.io/docs/zeta) when it is released.
+compiled Doxygen is available [here](https://rhthomas.github.io/docs/zeta).
 
 ## TODO
 
@@ -83,7 +89,9 @@ compiled Doxygen is not yet live online, but the link will reside
 - [ ] Wake-up node over RF with UB20.
 - [ ] Write unified `main.c` program.
 	- [ ] Incorporate Hibernus.
-		- [ ] Remove clashes with clock/pin initialisation.
+    	- [x] Test comparator.
+    	- [x] Test Hibernus in isolation.
+		- [ ] Remove clashes with clock/pin initialisation *(change as per the
+              above pinout diagram)*.
 	- [ ] Incorporate RESTOP.
-- [ ] Optimise code (more ISRs and use DMA).
-
+- [ ] Optimise code *(more ISRs and use DMA)*.

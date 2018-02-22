@@ -8,15 +8,19 @@
  * @details Pin-out:
  * ```
  * MSP430FR5739
- * -------+
+ * –––––––+
  *        |
+ * Radio: |
+ *    P1.4|<- Interrupt request (nIRQ)
  *    P3.3|-> Shutdown (SDN)
- *    P1.3|<- Interrupt request (nIRQ)
+ * SPI:   |
+ *    P1.3|-> CS (UCB0STE)
+ *    P1.6|-> Data Out (UCB0SIMO)
+ *    P1.7|<- Data In (UCB0SOMI)
+ *    P2.2|-> Serial Clock Out (UCB0CLK)
  *        |
- * -------+
+ * –––––––+
  * ```
- *
- * @sa spi.h for SPI related connections.
  */
 
 #ifndef ZETA_H

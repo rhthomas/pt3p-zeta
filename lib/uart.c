@@ -3,7 +3,6 @@
 void uart_init(void)
 {
     // USCI_A0 UART operation.
-    // P2SEL[1:0] = b10
     P2SEL1 |= TXPIN | RXPIN;
     P2SEL0 &= ~(TXPIN | RXPIN);
     // Reset UART state machine.
