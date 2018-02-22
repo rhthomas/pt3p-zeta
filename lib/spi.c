@@ -2,18 +2,18 @@
 
 void spi_init(void)
 {
-    P1DIR |= (SCLK | CS);
+    P1DIR |= (MOSI + CS);
+    P1DIR &= ~MISO;
     P1OUT |= CS;
-    P2DIR |= MOSI;
-    P2DIR &= ~MISO;
+    P2DIR |= SCLK;
 
     // Secondary functionality of pins.
-    P1SEL1 |= SCLK;
+    P2SEL1 |= SCLK;
 //    P1SEL1 |= CS;
-    P2SEL1 |= (MOSI | MISO);
+    P1SEL1 |= (MOSI | MISO);
 
     // Reset state-machine.
-    UCA0CTLW0 |= UCSWRST;
+    UCB0CTLW0 |= UCSWRST;
     /* SPI configuration:
      * 1. Master 3-pin mode.
      * 2. Synchronous.
@@ -22,25 +22,25 @@ void spi_init(void)
      * x. UCA0STE (P1.4) as CS pin. (not used, now manual)
      * x. Active low. (not used, now manual)
      * 5. SMCLK as source. */
-    UCA0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
+    UCB0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
 //    UCA0CTLW0 |= (UCMODE1 | UCSTEM);
-    UCA0CTLW0 |= UCSSEL_2;
+    UCB0CTLW0 |= UCSSEL_2;
     // No modulation.
-    UCA0MCTLW = 0;
+//    UCB0MCTLW = 0;
     // Run the SPI clk at 1MHz.
-    UCA0BRW_L = 3;
+    UCB0BRW_L = 3;
     // initialise the state-machine
-    UCA0CTLW0 &= ~UCSWRST;
+    UCB0CTLW0 &= ~UCSWRST;
 }
 
 uint8_t spi_xfer(uint8_t byte)
 {
-    while (!(UCA0IFG & UCTXIFG))
+    while (!(UCB0IFG & UCTXIFG))
         ; // Wait until Tx buffer is ready.
-    UCA0TXBUF = byte;
-    while (!(UCA0IFG & UCRXIFG))
+    UCB0TXBUF = byte;
+    while (!(UCB0IFG & UCRXIFG))
         ; // Wait until Rx buffer is ready.
-    return UCA0RXBUF;
+    return UCB0RXBUF;
 }
 
 void spi_cs_high(void)

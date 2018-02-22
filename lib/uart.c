@@ -7,22 +7,22 @@ void uart_init(void)
     P2SEL1 |= TXPIN | RXPIN;
     P2SEL0 &= ~(TXPIN | RXPIN);
     // Reset UART state machine.
-    UCA1CTL1 |= UCSWRST;
+    UCA0CTL1 |= UCSWRST;
     // UART clock uses SMCLK.
-    UCA1CTL1 = UCSSEL__SMCLK;
+    UCA0CTL1 = UCSSEL__SMCLK;
     // 3MHz SMCLK, 115200 baud, UCBRSx=0x01, UCBRFx=0, UCOS16=0,
-    UCA1MCTLW |= 0x0100;
+    UCA0MCTLW |= 0x0100;
     // UCBRx=26
-    UCA1BRW = 26;
+    UCA0BRW = 26;
     // Initialise eUSCI
-    UCA1CTLW0 &= ~UCSWRST;
+    UCA0CTLW0 &= ~UCSWRST;
 }
 
 void uart_putc(unsigned char ch)
 {
-    while (!(UCA1IFG & UCTXIFG))
+    while (!(UCA0IFG & UCTXIFG))
         ;
-    UCA1TXBUF = ch;
+    UCA0TXBUF = ch;
 }
 
 void uart_puts(const char *string)

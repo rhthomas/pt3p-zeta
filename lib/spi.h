@@ -26,10 +26,10 @@
 #include <stdint.h>
 #include <msp430.h>
 
-#define CS   (BIT4) ///< Chip select pin for SPI (P1.4).
-#define SCLK (BIT5) ///< SPI clock (P1.5).
-#define MISO (BIT1) ///< Master-in/Slave-out (P2.1).
-#define MOSI (BIT0) ///< Master-out/Slave-in (P2.0).
+#define CS   (BIT3) ///< Chip select pin for SPI (P1.3).
+#define SCLK (BIT2) ///< SPI clock (P2.2).
+#define MISO (BIT7) ///< Master-in/Slave-out (P1.7).
+#define MOSI (BIT6) ///< Master-out/Slave-in (P1.6).
 
 /**
  * Initialises the SPI peripheral on eUSCI A0.

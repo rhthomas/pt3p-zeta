@@ -59,5 +59,5 @@ void main(void)
 __interrupt void TIMER0_ISR(void)
 {
     P3OUT ^= BIT7;
-//    uart_puts("Listening...\r\n");
+    uart_puts("Listening...\r\n");
 }

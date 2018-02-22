@@ -41,9 +41,9 @@
 /**
  * Interrupt request (active low).
  *
- * P1.3
+ * P1.4
  */
-#define IRQ (BIT3)
+#define IRQ (BIT4)
 
 /**
  * Channel of operation, 250kHz increments.
