@@ -4,6 +4,16 @@
  * @date 2018-02-09
  *
  * @brief Setup functions to initialise general peripherals.
+ *
+ * @details Pin-out:
+ * ```
+ * MSP430FR5739
+ * –––––––+
+ *        |
+ *    P1.0|<- External comparator (INT).
+ *    P1.1|<- UB20M power-gated output (INT).
+ *        |
+ * –––––––+
  */
 
 #ifndef SETUP_H
@@ -11,6 +21,9 @@
 
 #include <msp430.h>
 #include <stdint.h>
+
+#define UB20     (BIT0) ///< UB20 interrupt comes from P4.0.
+#define EXT_COMP (BIT0) ///< External comparator inputs to P1.0.
 
 /**
  * @defgroup init Initialisation

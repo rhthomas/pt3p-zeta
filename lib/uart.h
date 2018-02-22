@@ -4,6 +4,17 @@
  * @date 2018-02-07
  *
  * @brief UART functions for printing to the terminal.
+ *
+ * @details Pin-out:
+ * ```
+ * MSP430FR5739
+ * –––––––+
+ *        |
+ *    P2.0|-> Transmit output (UCA0TXD)
+ *    P2.1|<- Receive input (UCA0RXD)
+ *        |
+ * –––––––+
+ * ```
  */
 
 #ifndef UART_H

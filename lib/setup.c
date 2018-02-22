@@ -13,10 +13,17 @@ void io_init(void)
     // Reset interrupt flags.
     PAIFG = 0;
     PBIFG = 0;
-    /// @todo Setup UB20 interrupt on P4.0.
-
+    // Set UB20 on P4.0 as input (no pull-up) with interrupts enabled.
+    P4DIR &= ~(BIT0);
+    P4REN &= ~(BIT0);
+    P4IE |= BIT0;
+    /* Set external comparator on P1.0 as input (no pull-up) with interrupts
+     * enabled.
+     */
+    P1DIR &= ~(EXT_COMP); // Set P1.0 as an input.
+    P1REN &= ~(EXT_COMP); // Disable pull resistors.
     // Set PJ pins as clock outputs.
-    PJSEL0 |= (BIT2 | BIT1 | BIT0);
+//    PJSEL0 |= (BIT2 | BIT1 | BIT0);
 }
 
 void clock_init(void)
@@ -41,5 +48,4 @@ void timer_init(void)
     TA0CTL |= (TASSEL__ACLK | MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
     TA0CCR0 = 0x2711; // ~1s delay.
-//    TA0CCR0 = 0x1389; // ~0.5s delay.
 }

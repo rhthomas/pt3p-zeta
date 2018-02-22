@@ -12,7 +12,7 @@
  *        |
  * Radio: |
  *    P1.4|<- Interrupt request (nIRQ)
- *    P3.3|-> Shutdown (SDN)
+ *    P1.5|-> Shutdown (SDN)
  * SPI:   |
  *    P1.3|-> CS (UCB0STE)
  *    P1.6|-> Data Out (UCB0SIMO)
@@ -81,9 +81,8 @@ uint8_t reverse(uint8_t byte);
  * 6. Set unused sync bytes `{AA, AA, AA, AA}`.
  *
  * @ingroup init
- * @note SPI initialisation function must be called before initialising the
+ * @pre SPI initialisation function (spi_init()) must be called before initialising the
  * radio.
- * @see spi_init()
  */
 void zeta_init(void);
 
