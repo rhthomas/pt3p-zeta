@@ -91,7 +91,7 @@ compiled Doxygen is available [here](https://rhthomas.github.io/docs/zeta).
 	- [ ] Incorporate Hibernus.
     	- [x] Test comparator.
     	- [x] Test Hibernus in isolation.
-		- [ ] Remove clashes with clock/pin initialisation *(change as per the
+		- [x] Remove clashes with clock/pin initialisation *(change as per the
               above pinout diagram)*.
 	- [ ] Incorporate RESTOP.
 - [ ] Optimise code *(more ISRs and use DMA)*.
