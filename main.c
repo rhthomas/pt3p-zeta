@@ -3,8 +3,40 @@
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
  * @date 2018-02-09
  *
- * @brief Combined code of all modules, demonstrating the project
- * solution.
+ * @brief Combined code of all modules, demonstrating the project solution.
+ */
+
+#include "setup.h" // System setup functions
+#include "hibernation.h" // Hibernus++
+#include "RESTOP_func.h" // RESTOP add-on
+#include "Config.h" // RESTOP configuration
+#include "uart.h" // Debugging
+#include "zeta.h" // Radio
+
+#define UB20 (BIT0) ///< UB20 interrupt comes from P4.0.
+//#define USE_LPM_4_5 ///< Define to enter LPM4.5 at best, else LPM4 only.
+
+uint8_t in_packet[PACKET_SIZE]; ///< Array for received data.
+
+/**
+ * Call initialisation functions.
+ *
+ * Used when exiting LPM4.5 in the ISR.
+ *
+ * @see low_power_mode_4_5
+ * @see PORT4_ISR
+ */
+void setup(void);
+
+/**
+ * Sets the necessary registers to enter LPM4.5.
+ *
+ * @see Section 1.4 in the 57xx user guide.
+ */
+void low_power_mode_4_5(void);
+
+/**
+ * Main loop.
  *
  * The operation is described as follows:
  * 1. Initialise I/O ports and clock settings.
@@ -19,42 +51,22 @@
  * 8. MCU then handles the radio reception and returns to LPM4.5 (repeat
  *    indefinitely from 6).
  */
-
-// Libraries.
-#include "setup.h" // System setup functions
-#include "hibernation.h" // Hibernus++
-#include "RESTOP_func.h" // RESTOP add-on
-#include "Config.h" // RESTOP configuration
-#include "uart.h" // Debugging
-#include "zeta.h" // Radio
-
-#define UB20 (BIT0) ///< UB20 interrupt comes from P4.0.
-
-uint8_t in_packet[PACKET_SIZE]; ///< Array for received data.
-
-/**
- * Main loop.
- */
 void main(void)
 {
     // Stop watchdog timer.
     WDTCTL = WDTPW | WDTHOLD;
 
     // Setup peripherals.
-    io_init();
-    clock_init();
-    /// @todo This has its own clock/port setup code. Check this.
-    Hibernus();
-    uart_init();
-    spi_init();
-    zeta_init();
-
-    /// @todo Add RESTOP commands for ZetaPlus startup.
+    setup();
 
     // Main loop.
     while (1) {
-        // Go to sleep.
-        __bis_SR_register(LPM4_bits | GIE);
+        // Go to sleep and wait for interrupt from UB20.
+#ifdef USE_LPM_4_5
+        low_power_mode_4_5();
+#else
+        __bis_SR_register(LPM4_bits + GIE);
+#endif
         // Set Rx mode.
         zeta_select_mode(1);
         // Operating on channel 0 with packet size of 12 bytes.
@@ -70,6 +82,33 @@ void main(void)
     }
 }
 
+void setup(void)
+{
+    io_init();
+    clock_init();
+    /// @todo Hibernus has its own clock/port setup code. Check this.
+    Hibernus();
+    uart_init();
+    spi_init();
+    zeta_init();
+    /// @todo Add RESTOP commands for ZetaPlus startup.
+}
+
+void low_power_mode_4_5(void)
+{
+    // Enable interrupts.
+    __bis_SR_register(GIE);
+    // Unlock PMM registers.
+    PMMCTL0_H = 0xA5;
+    // Disable SVS module.
+    PMMCTL0_L &= ~(SVSHE + SVSLE);
+    // Clear LPM4.5 IFG.
+    PMMIFG &= ~PMMLPM5IFG;
+    // Enter LPM4.5
+    PMMCTL0_L |= PMMREGOFF;
+    __bis_SR_register(LPM4_bits);
+}
+
 /**
  * ISR that is triggered by UB20.
  *
@@ -77,10 +116,18 @@ void main(void)
  * the processor back into active mode. When leaving the ISR, the code then
  * continues from after __bis_SR_register, of which contains the radio code
  * (does the talking/listening).
+ *
+ * @todo Exit LPM4.5 code? Reconfigure IO, system and unlock the system.
  */
 #pragma vector=PORT4_VECTOR
 __interrupt void PORT4_ISR(void)
 {
+#ifdef USE_LPM_4_5
+    // Reconfigure system and IO as required for the application.
+    setup();
+    // Unlock the system
+    PM5CTL0 &= ~LOCKLPM5;
+#endif
     // Clear P4.0 interrupt flag.
     P4IFG &= ~UB20;
     // Disable interrupts.

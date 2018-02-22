@@ -29,7 +29,7 @@ void clock_init(void)
     CSCTL2 = SELA_1 + SELS_3 + SELM_3;
     // ACLK/1, SMCLK/8, MCLK/1
     CSCTL3 = DIVA_0 + DIVS_3 + DIVM_0;
-    // Power down unused clocks.
+    // Power down unused clocks (used for LPM4.5).
     CSCTL4 = XT1OFF + XT2OFF;
     // Lock clock registers.
     CSCTL0_H = 0;
