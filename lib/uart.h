@@ -5,7 +5,7 @@
  *
  * @brief UART functions for printing to the terminal.
  *
- * @details Pin-out:
+ * Pin-out:
  * ```
  * MSP430FR5739
  * –––––––+
@@ -27,7 +27,7 @@
 #define RXPIN (BIT1) ///< UCA0RXD on P2.1.
 
 /**
- * Initialise the UART peripheral. Useful for debugging.
+ * @brief Initialise the UART peripheral. Useful for debugging.
  *
  * @ingroup init
  */
@@ -40,7 +40,7 @@ void uart_init(void);
  */
 
 /**
- * Print character over UART.
+ * @brief Print character over UART.
  *
  * @param ch : Character byte to print.
  * @bug This is working (Saleae) but not on the serial line? Perhaps this is
@@ -49,7 +49,7 @@ void uart_init(void);
 void uart_putc(unsigned char ch);
 
 /**
- * Print string of characters over UART.
+ * @brief Print string of characters over UART.
  *
  * @param string : Pointer to string to print.
  */

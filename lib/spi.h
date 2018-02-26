@@ -5,7 +5,7 @@
  *
  * @brief Simple SPI library for MSP430FR5739 MCU.
  *
- * @details Pin-out:
+ * Pin-out:
  * ```
  * MSP430FR5739
  * –––––––+
@@ -31,7 +31,7 @@
 #define MOSI (BIT6) ///< Master-out/Slave-in (P1.6).
 
 /**
- * Initialises the SPI peripheral on eUSCI A0.
+ * @brief Initialises the SPI peripheral on eUSCI A0.
  *
  * SPI configuration:
  * 1. Master 3-pin mode (CS is handled manually).
@@ -46,14 +46,21 @@
 void spi_init(void);
 
 /**
- * Begin SPI transfer.
+ * @brief Begin SPI transfer.
  *
  * @param byte : Data to transmit to slave.
  * @return Data received from slave.
  */
 uint8_t spi_xfer(uint8_t byte);
 
+/**
+ * @brief Set the chip select pin high.
+ */
 void spi_cs_high(void);
+
+/**
+ * @brief Set the chip select pin low.
+ */
 void spi_cs_low(void);
 
 #endif // SPI_H

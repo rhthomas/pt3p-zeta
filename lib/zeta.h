@@ -5,7 +5,7 @@
  *
  * @brief Library for interfacing with ZetaPlus radio module.
  *
- * @details Pin-out:
+ * Pin-out:
  * ```
  * MSP430FR5739
  * –––––––+
@@ -31,7 +31,7 @@
 #include "spi.h"
 
 /**
- * Shutdown pin.
+ * @brief Shutdown pin.
  *
  * P3.3
  *
@@ -43,14 +43,14 @@
 #define SDN (BIT3)
 
 /**
- * Interrupt request (active low).
+ * @brief Interrupt request (active low).
  *
  * P1.4
  */
 #define IRQ (BIT4)
 
 /**
- * Channel of operation, 250kHz increments.
+ * @brief Channel of operation, 250kHz increments.
  *
  * We use this to move closer to the 900MHz band that the UB20 antennas are
  * tuned to.
@@ -60,7 +60,7 @@
 #define CHANNEL (15u)
 
 /**
- * Reverses the order of a byte.
+ * @brief Reverses the order of a byte.
  *
  * Called within zeta_sync_byte().
  *
@@ -71,7 +71,7 @@
 uint8_t reverse(uint8_t byte);
 
 /**
- * Setup the device.
+ * @brief Setup the device.
  *
  * 1. Sets up I/O pins. SDN low to keep the radio active.
  * 2. Waits for radio to be ready for data.
@@ -87,14 +87,14 @@ uint8_t reverse(uint8_t byte);
 void zeta_init(void);
 
 /**
- * Wait for interrupt from CODEC (data ready).
+ * @brief Wait for interrupt from CODEC (data ready).
  *
  * @test Check these are correct.
  */
 void zeta_wait_irq(void);
 
 /**
- * Wait until device is ready for another command.
+ * @brief Wait until device is ready for another command.
  *
  * @test Check these are correct.
  */
@@ -109,7 +109,7 @@ void zeta_ready(void);
  */
 
 /**
- * Set mode of the device [ATM].
+ * @brief Set mode of the device [ATM].
  *
  * @param mode : Operating mode of the radio.
  *      | Value | Name  | Description |
@@ -121,7 +121,7 @@ void zeta_ready(void);
 void zeta_select_mode(uint8_t mode);
 
 /**
- * Receive mode configuration [ATR].
+ * @brief Receive mode configuration [ATR].
  *
  * @param ch : Channel.
  * @param pLength : Packet length.
@@ -129,7 +129,7 @@ void zeta_select_mode(uint8_t mode);
 void zeta_rx_mode(uint8_t ch, uint8_t pLength);
 
 /**
- * Set sync bytes and addressing after preamble [ATA].
+ * @brief Set sync bytes and addressing after preamble [ATA].
  *
  * These appear directly after the preamble in the Tx'd RF data. Can be used as
  * a form of addressing. If the bytes are set, the radio will only pass on data
@@ -145,7 +145,7 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength);
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4);
 
 /**
- * Set baud-rate between radio and MCU [ATH].
+ * @brief Set baud-rate between radio and MCU [ATH].
  *
  * @param baud : Data rate between ZetaPlus and MCU.
  *      | `baud` | Data Rate |
@@ -159,7 +159,7 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4);
 void zeta_set_baud_host(uint8_t baud);
 
 /**
- * Set baud-rate of RF [ATB].
+ * @brief Set baud-rate of RF [ATB].
  *
  * @param baud : RF data rate, must be at least double host baud.
  *      | `baud` | RF Rate   |
@@ -176,7 +176,7 @@ void zeta_set_baud_host(uint8_t baud);
 void zeta_set_baud_rf(uint8_t baud);
 
 /**
- * Set RF output power [ATP].
+ * @brief Set RF output power [ATP].
  *
  * @param pwr : RF TX output power (1-127).
  * @note Not a linear function. The output power varies depending on factors
@@ -187,7 +187,7 @@ void zeta_set_baud_rf(uint8_t baud);
 void zeta_set_rf_power(uint8_t pwr);
 
 /**
- * Enable data error checking [ATE].
+ * @brief Enable data error checking [ATE].
  *
  * @param en : Enable CRC error checking.
  *      | | |
@@ -198,14 +198,14 @@ void zeta_set_rf_power(uint8_t pwr);
 void zeta_enable_crc(uint8_t en);
 
 /**
- * Reset the radio to its power on defaults [ATD].
+ * @brief Reset the radio to its power on defaults [ATD].
  */
 void zeta_reset_default(void);
 
 /** @} */
 
 /**
- * Get RSSI from receiver [ATQ].
+ * @brief Get RSSI from receiver [ATQ].
  *
  * @return Received signal strength (0-255).
  * @test Check this method is correct. Does nIRQ need to go high?
@@ -214,7 +214,7 @@ void zeta_reset_default(void);
 uint8_t zeta_get_rssi(void);
 
 /**
- * Get version of radio firmware.
+ * @brief Get version of radio firmware.
  *
  * @note To see output, attach Saleae.
  * @warning Potential race condition with !(P1IN & IRQ) poll.
@@ -223,7 +223,7 @@ uint8_t zeta_get_rssi(void);
 void zeta_get_vers(void);
 
 /**
- * Get current radio configuration.
+ * @brief Get current radio configuration.
  *
  * Returns `#?12345678` where:
  * 1. Operating mode (Rx = 1, Ready = 2).
@@ -247,7 +247,7 @@ void zeta_get_settings(void);
  */
 
 /**
- * Transmit mode configuration [ATS].
+ * @brief Transmit mode configuration [ATS].
  *
  * @param ch : Channel to transmit on.
  * @param pLength : Length of packet.
@@ -256,19 +256,19 @@ void zeta_get_settings(void);
 void zeta_send_open(uint8_t ch, uint8_t pLength);
 
 /**
- * Write byte to TX buffer (to send).
+ * @brief Write byte to TX buffer (to send).
  *
  * @param data : Data byte to send.
  */
 void zeta_write_byte(uint8_t data);
 
 /**
- * Send packet closing.
+ * @brief Send packet closing.
  */
 void zeta_send_close(void);
 
 /**
- * Send byte packet over radio.
+ * @brief Send byte packet over radio.
  *
  * @param packet : Pointer to byte packet to send.
  * @param len : Length of packet.
@@ -284,20 +284,20 @@ void zeta_send_packet(uint8_t packet[], uint8_t len);
  */
 
 /**
- * Read one byte from FIFO only.
+ * @brief Read one byte from FIFO only.
  *
  * @return Byte from the FIFO buffer.
  */
 uint8_t zeta_read_byte(void);
 
 /**
- * Read packet from FIFO loop until empty.
+ * @brief Read packet from FIFO loop until empty.
  *
- * '#'
- * 'R'
- * <RSSI>
- * <Length>
- * <... Packet ...>
+ * * '#'
+ * * 'R'
+ * * RSSI
+ * * Length
+ * * Packet
  *
  * @param[out] packet : Array to return Rx'd packet to.
  * @test Confirm that this works as expected.

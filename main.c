@@ -18,7 +18,7 @@
 uint8_t in_packet[5u + 4u]; ///< Array for received data.
 
 /**
- * Call initialisation functions.
+ * @brief Call initialisation functions.
  *
  * Used when exiting LPM4.5 in the ISR.
  *
@@ -28,14 +28,14 @@ uint8_t in_packet[5u + 4u]; ///< Array for received data.
 void setup(void);
 
 /**
- * Sets the necessary registers to enter LPM4.5.
+ * @brief Sets the necessary registers to enter LPM4.5.
  *
  * @see Section 1.4 in the 57xx user guide.
  */
-void low_power_mode_4_5(void);
+inline void low_power_mode_4_5(void);
 
 /**
- * Main loop.
+ * @brief Main loop.
  *
  * The operation is described as follows:
  * 1. Initialise I/O ports and clock settings.
@@ -85,14 +85,14 @@ void setup(void)
 {
     io_init();
     clock_init();
-    hibernus();
+    Hibernus();
     uart_init();
     spi_init();
     zeta_init();
     /// @todo Add RESTOP commands for ZetaPlus startup.
 }
 
-void low_power_mode_4_5(void)
+inline void low_power_mode_4_5(void)
 {
     // Enable interrupts.
     __bis_SR_register(GIE);
@@ -108,7 +108,7 @@ void low_power_mode_4_5(void)
 }
 
 /**
- * ISR that is triggered by UB20.
+ * @brief ISR that is triggered by UB20.
  *
  * Used for waking up the processor, this ISR clears the LPM4 bits which puts
  * the processor back into active mode. When leaving the ISR, the code then

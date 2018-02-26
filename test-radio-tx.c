@@ -13,12 +13,11 @@
 uint8_t msg[5u] = {'H', 'E', 'L', 'L', 'O'};
 
 /**
- * Main loop.
+ * @brief Main loop.
  */
 void main(void)
 {
     // Stop watchdog timer.
-
     WDTCTL = WDTPW + WDTHOLD;
 
     // Setup peripherals.
@@ -42,7 +41,7 @@ void main(void)
 }
 
 /**
- * Timer overflow ISR.
+ * @brief Timer overflow ISR.
  *
  * Triggers every ~1s and exits the processor from LPM3. The MCU then sends a
  * packet onto the ether, sleeps the radio and returns to LPM3.

@@ -5,7 +5,7 @@
  *
  * @brief Setup functions to initialise general peripherals.
  *
- * @details Pin-out:
+ * Pin-out:
  * ```
  * MSP430FR5739
  * –––––––+
@@ -14,6 +14,7 @@
  *    P1.1|<- UB20M power-gated output (INT).
  *        |
  * –––––––+
+ * ```
  */
 
 #ifndef SETUP_H
@@ -32,7 +33,7 @@
  */
 
 /**
- * Initialise IO pins and buses.
+ * @brief Initialise IO pins and buses.
  *
  * All ports are output, driven low and interrupt flags are cleared.
  *
@@ -41,7 +42,7 @@
 void io_init(void);
 
 /**
- * Initialise system clock.
+ * @brief Initialise system clock.
  *
  * | Clock | Module | Freq. |
  * |-------|--------|-------|
@@ -54,7 +55,7 @@ void io_init(void);
 void clock_init(void);
 
 /**
- * Setup timer for periodic transmissions.
+ * @brief Setup timer for periodic transmissions.
  */
 void timer_init(void);
 
