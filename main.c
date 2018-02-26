@@ -65,7 +65,7 @@ void main(void)
         low_power_mode_4_5();
 #else
         __bis_SR_register(LPM4_bits + GIE);
-#endif
+#endif // USE_LPM_4_5
         // Set Rx mode.
         zeta_select_mode(1);
         // Operating on channel 0 with packet size of 9 bytes.
@@ -125,7 +125,7 @@ __interrupt void PORT4_ISR(void)
     setup();
     // Unlock the system
     PM5CTL0 &= ~LOCKLPM5;
-#endif
+#endif // USE_LPM_4_5
     switch (__even_in_range(P4IV, P4IV_P4IFG0)) {
     case P4IV_P4IFG0:
         // Clear P4.0 interrupt flag.
