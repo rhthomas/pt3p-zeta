@@ -13,8 +13,6 @@
 //#include "RESTOP_func.h" // RESTOP add-on
 //#include "Config.h" // RESTOP configuration
 
-//#define USE_LPM_4_5 ///< Define to enter LPM4.5 at best, else LPM4 only.
-
 uint8_t in_packet[5u + 4u]; ///< Array for received data.
 
 /**

@@ -12,9 +12,6 @@
 #include "led.h"
 #include "hibernation.h"
 
-/**
- * @brief Main function.
- */
 void main(void)
 {
     // Stop watchdog timer.
@@ -24,11 +21,11 @@ void main(void)
     clock_init();
     Hibernus();
 
-    uint8_t i;
+    __bis_SR_register(GIE);
+
+    uint8_t i = 0;
     while (1) {
-        for (i = 0; i < 256; i++) {
-            led_set(i);
-            __delay_cycles(24e5);
-        }
+        led_set(i++);
+        __delay_cycles(24e5);
     }
 }
