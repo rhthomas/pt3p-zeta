@@ -22,6 +22,7 @@ void io_init(void)
      */
     P1DIR &= ~(EXT_COMP); // Set P1.0 as an input.
     P1REN &= ~(EXT_COMP); // Disable pull resistors.
+    P1IE |= EXT_COMP;
 }
 
 void clock_init(void)
@@ -45,5 +46,6 @@ void timer_init(void)
     // ACLK, upmode, clear.
     TA0CTL |= (TASSEL__ACLK | MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-    TA0CCR0 = 0x2711; // ~1s delay.
+//    TA0CCR0 = 0x2711; // ~1s delay.
+    TA0CCR0 = 0x0400; // ~1s delay.
 }

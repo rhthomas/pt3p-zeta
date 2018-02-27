@@ -71,16 +71,12 @@ const unsigned int gen[230] = {
     0x5e6, 0x5e8, 0x5ea, 0x5ec, 0x5ee, 0x5f0, 0x5f2, 0x5fa, 0x5fc, 0x5fe, 0x640,
     0x642, 0x646, 0x648, 0x64a, 0x64c, 0x64e, 0x654, 0x656, 0x658, 0x65a, 0x65c,
     0x65e, 0x660, 0x66a, 0x66c, 0x66e, 0x700, 0x702, 0x704, 0x706, 0x708, 0x70a,
-    0x712, 0x71a, 0x71c, 0x71e, 0x8c0, 0x8c2, 0x8c4, 0x8c6, 0x8cc, 0x8ce}; //Yes
+    0x712, 0x71a, 0x71c, 0x71e, 0x8c0, 0x8c2, 0x8c4, 0x8c6, 0x8cc, 0x8ce};
 
 unsigned int i;
 
 void Hibernus(void)
 {
-//    // System_Init
-//    GPIO_configuration();
-//    Clock_configuration();
-
 #ifdef USE_SWITCHES
     // Setting threshold VMIN=2.27V
     Set_V(VMIN);// V Restore
@@ -91,16 +87,14 @@ void Hibernus(void)
     // Waiting until the system reaches the restore threshold
     t = (P1IN & BIT0); // t = 0;
     if (t == 0) {
-
         *FLAG_interrupt = 1;
-
         int_rising();
-//        P1IFG = 0; // P2 IFG flag cleared
-//        P1IES &= ~(BIT0); // P2.0 Lo/Hi edge interrupt P2OUT &= ~(BIT0);
-//        P1IE |= BIT0; // P2.0 interrupt enabled
-//        P1IFG = 0; // P2 IFG flag cleared
 
+#ifdef USE_LPM45
+        enter_lpm45();
+#else
         __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
+#endif // USE_LPM45
         __no_operation();
     }
 
@@ -115,12 +109,7 @@ void Hibernus(void)
 #endif // USE_SWITCHES
 
         *FLAG_interrupt = 2;
-
         int_falling();
-//        P1IFG = 0; // P2 IFG flag cleared
-//        P1IES |= BIT0; // P2.0 Hi/lo edge interrupt
-//        P1IE |= BIT0; // P2.0 interrupt enabled
-//        P1IFG = 0; // P2 IFG flag cleared
 
         __bis_SR_register(GIE); // Set interrupt
         __no_operation();
@@ -137,12 +126,7 @@ void Hibernus(void)
 #endif // USE_SWITCHES
 
         *FLAG_interrupt = 2;
-
         int_falling();
-//        P1IFG = 0; // P2 IFG flag cleared
-//        P1IES |= BIT0; // P2.0 Hi/lo edge interrupt
-//        P1IE |= BIT0; // P2.0 interrupt enabled
-//        P1IFG = 0; // P2 IFG flag cleared
 
         __bis_SR_register(GIE); // Set interrupt
         __no_operation();
@@ -254,12 +238,7 @@ void Restore(void)
 #endif // USE_SWITCHES
 
     *FLAG_interrupt = 2;
-
     int_falling();
-//    P1IFG = 0; // P2 IFG flag cleared
-//    P1IES |= BIT0; // P2.0 Hi/lo edge interrupt
-//    P1IE |= BIT0; // P2.0 interrupt enabled
-//    P1IFG = 0; // P2 IFG flag cleared
 
     __bis_SR_register(GIE);
     __no_operation();
@@ -397,55 +376,34 @@ inline void int_rising(void)
     P1IFG = 0; // Clear P1 interrupt flag.
 }
 
-//inline void low_power_mode_4_5(void)
-//{
-//    // Enable interrupts.
-//    __bis_SR_register(GIE);
-//    // Unlock PMM registers.
-//    PMMCTL0_H = 0xA5;
-//    // Disable SVS module.
-//    PMMCTL0_L &= ~(SVSHE + SVSLE);
-//    // Clear LPM4.5 IFG.
+#ifdef USE_LPM45
+void exit_lpm45(void)
+{
+    io_init();
+    clock_init();
+    timer_init();
+}
+
+inline void enter_lpm45(void)
+{
+    // Set all IO ports at GPIO.
+    PASEL0 = 0;
+    PASEL1 = 0;
+    PBSEL0 = 0;
+    PBSEL1 = 0;
+    PJSEL0 = 0;
+    PJSEL1 = 0;
+    // Unlock PMM registers.
+    PMMCTL0_H = 0xA5;
+    // Clear LPM4.5 IFG.
 //    PMMIFG &= ~PMMLPM5IFG;
-//    // Enter LPM4.5
-//    PMMCTL0_L |= PMMREGOFF;
-//    __bis_SR_register(LPM4_bits);
-//}
-
-//void GPIO_configuration(void)
-//{
-//
-//    //Interrupt input external comparator
-//    P2REN &= ~(BIT0); // Disable pull-down and pull-up resistor
-//    P2DIR &= ~(BIT0); // Direction = BIT0 input
-//
-//    //GPIO configuration
-//    P1OUT &= ~(0xF9);
-//    P2OUT &= ~(0xBE);
-//    P3OUT &= ~(0xFB);
-//    P4OUT &= ~(0xFF);
-//    PJOUT &= ~(0xFF); // Configure the pull-down resistor
-//
-//    P1DIR |= 0xF9;
-//    P2DIR |= 0x3E;
-//    P3DIR |= 0xFB;
-//    P4DIR |= 0xFF;
-//    PJDIR |= 0xFF; // // Direction = output
-//
-//}
-
-//void Clock_configuration(void)
-//{
-//
-//    //setting core frequency
-//    CSCTL0_H = 0xA5; // Unlock register
-//    CSCTL1 &= ~(DCORSEL); //Set max. DCO setting. 5.33MH in this case
-//    CSCTL1 |= DCOFSEL0 + DCOFSEL1; //DCO frequency select register 8MHz
-//    CSCTL2 = SELA_1 + SELS_3 + SELM_3; // Selects the ACLK, MCLK AND SMCLK sources register
-//                                       // Set ACLK = VLO; MCLK = DCO; SMCLK = DCO;
-//    CSCTL3 = DIVA_0 + DIVS_0 + DIVM_0; // MCLK, SMCLK and ACLK source divider/prescaler register.
-//    CSCTL0_H = 0x01; // Lock Register
-//}
+    // Disable SVS module.
+    PMMCTL0_L &= ~(SVSHE + SVSLE);
+    // Enter LPM4.5
+    PMMCTL0_L |= PMMREGOFF;
+    __bis_SR_register(LPM4_bits + GIE);
+}
+#endif // USE_LPM45
 
 #pragma vector=PORT1_VECTOR
 __interrupt void PORT1_ISR(void)
@@ -458,8 +416,6 @@ __interrupt void PORT1_ISR(void)
 
         // Hibernate the processor.
         if (*FLAG_interrupt == 2) {
-//            P1IFG = 0;
-//            P1IE &= ~BIT0;
             Hibernate();
 
             if (pro == 0) {
@@ -471,12 +427,7 @@ __interrupt void PORT1_ISR(void)
                 t = (P1IN & BIT0); // t = 1;
                 if (t == 0) {
                     *FLAG_interrupt = 4;
-
                     int_rising();
-//                    P1IFG = 0; // P2 IFG flag cleared
-//                    P1IES &= ~(BIT0); // P2.0 Lo/Hi edge interrupt P2OUT &= ~(BIT0);
-//                    P1IE |= BIT0; // P2.0 interrupt enabled
-//                    P1IFG = 0; // P2 IFG flag cleared
 
 #ifdef HIB_DEBUG
                     //For Debugging: LPM
@@ -485,7 +436,11 @@ __interrupt void PORT1_ISR(void)
 #endif // HIB_DEBUG
 
                     // Enter sleep state.
+#ifdef USE_LPM45
+                    enter_lpm45();
+#else
                     __bis_SR_register(LPM4_bits + GIE);
+#endif // USE_LPM45
                     __no_operation();
                 } else {
 #ifdef USE_SWITCHES
@@ -495,12 +450,7 @@ __interrupt void PORT1_ISR(void)
 #endif // USE_SWITCHES
 
                     *FLAG_interrupt = 2;
-
                     int_falling();
-//                    P1IFG = 0; // P2 IFG flag cleared
-//                    P1IES |= BIT0; // P2.0 Hi/lo edge interrupt
-//                    P1IE |= BIT0; // P2.0 interrupt enabled
-//                    P1IFG = 0; // P2 IFG flag cleared
 
 #ifdef HIB_DEBUG
                     P2DIR |= BIT6;
@@ -530,12 +480,7 @@ __interrupt void PORT1_ISR(void)
 #endif // USE_SWITCHES
 
             *FLAG_interrupt = 2;
-
             int_falling();
-//            P1IFG = 0; // P2 IFG flag cleared
-//            P1IES |= BIT0; // P2.0 Hi/lo edge interrupt
-//            P1IE |= BIT0; // P2.0 interrupt enabled
-//            P1IFG = 0; // P2 IFG flag cleared
 
 #ifdef HIB_DEBUG
             P2DIR |= BIT6;

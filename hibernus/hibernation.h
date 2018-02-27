@@ -34,6 +34,12 @@
 #define HIBERNATION_H
 
 #include <msp430.h>
+#include "setup.h"
+
+// Config defines.
+//#define USE_SWITCHES ///< Use switches to change trigger point of comparator.
+//#define HIB_DEBUG ///< Debug hibernus with specific I/O outputs.
+//#define USE_LPM45 ///< When sleeping, go as low as LPM4.5.
 
 // Interrupt and restoring.
 #define INT   (0xEDD8) ///< Address storing the interrupt flag.
@@ -51,13 +57,10 @@
 #define PC (0xEDF0) ///< Address storing the program counter.
 
 // Threshold.
+#ifdef USE_SWITCHES
 #define VMIN  (2270) ///<
 #define VMINN (2170) ///<
-
-// Config defines.
-//#define USE_SWITCHES ///< Use switches to change trigger point of comparator.
-//#define HIB_DEBUG ///< Debug hibernus with specific I/O outputs.
-//#define USE_LPM_4_5 ///< When sleeping, go as low as LPM4.5.
+#endif // USE_SWITCHES
 
 /**
  * @defgroup hib Hibernus
@@ -126,23 +129,14 @@ inline void int_falling(void);
 inline void int_rising(void);
 
 /**
- * @brief Initialise I/O pins.
  *
- * @deprecated Already handled by `io_init` in setup.h.
  */
-void GPIO_configuration(void);
-
-/**
- * @brief Initialise clocks.
- *
- * @deprecated Already handled by `clock_init` in setup.h.
- */
-void Clock_configuration(void);
+void exit_lpm45(void);
 
 /**
  *
  */
-inline void low_power_mode_4_5(void);
+inline void enter_lpm45(void);
 
 /**
  * @brief ISR for external comparator trigger.

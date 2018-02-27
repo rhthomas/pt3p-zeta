@@ -119,10 +119,10 @@ inline void low_power_mode_4_5(void)
 __interrupt void PORT4_ISR(void)
 {
 #ifdef USE_LPM_4_5
-    // Reconfigure system and IO as required for the application.
-    setup();
     // Unlock the system
     PM5CTL0 &= ~LOCKLPM5;
+    // Reconfigure system and IO as required for the application.
+    setup();
 #endif // USE_LPM_4_5
     switch (__even_in_range(P4IV, P4IV_P4IFG0)) {
     case P4IV_P4IFG0:
