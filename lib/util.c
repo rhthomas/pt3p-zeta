@@ -1,4 +1,4 @@
-#include "setup.h"
+#include <util.h>
 
 void io_init(void)
 {
@@ -14,9 +14,9 @@ void io_init(void)
     PAIFG = 0;
     PBIFG = 0;
     // Set UB20 on P4.0 as input (no pull-up) with interrupts enabled.
-//    P4DIR &= ~(BIT0);
-//    P4REN &= ~(BIT0);
-//    P4IE |= BIT0;
+//    P4DIR &= ~(UB20);
+//    P4REN &= ~(UB20);
+//    P4IE |= UB20;
     /* Set external comparator on P1.0 as input (no pull-up) with interrupts
      * enabled.
      */
@@ -49,3 +49,32 @@ void timer_init(void)
 //    TA0CCR0 = 0x2711; // ~1s delay.
     TA0CCR0 = 0x0400; // ~1s delay.
 }
+
+void led_set(uint8_t byte)
+{
+    PJOUT = (byte & 0x0F);
+    P3OUT = (byte & 0xF0);
+}
+
+void led_clear(void)
+{
+    PJOUT = 0;
+    P3OUT = 0;
+}
+
+#ifdef USE_LPM45
+inline void enter_lpm45(void)
+{
+    // Enable interrupts.
+    __bis_SR_register(GIE);
+    // Unlock PMM registers.
+    PMMCTL0_H = 0xA5;
+    // Disable SVS module.
+    PMMCTL0_L &= ~(SVSHE + SVSLE);
+    // Clear LPM4.5 IFG.
+    PMMIFG &= ~PMMLPM5IFG;
+    // Enter LPM4.5
+    PMMCTL0_L |= PMMREGOFF;
+    __bis_SR_register(LPM4_bits);
+}
+#endif // USE_LPM45

@@ -1,5 +1,5 @@
 /**
- * @file setup.h
+ * @file util.h
  * @author Rhys Thomas <rt8g15@soton.ac.uk>
  * @date 2018-02-09
  *
@@ -8,20 +8,23 @@
  * Pin-out:
  * ```
  * MSP430FR5739
- * –––––––+
+ * -------+
  *        |
  *    P1.0|<- External comparator (INT).
  *    P1.1|<- UB20M power-gated output (INT).
  *        |
- * –––––––+
+ * -------+
  * ```
  */
 
-#ifndef SETUP_H
-#define SETUP_H
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <msp430.h>
 #include <stdint.h>
+
+// Config defines.
+#define USE_LPM45 ///< When sleeping, go as low as LPM4.5.
 
 #define UB20     (BIT0) ///< UB20 interrupt comes from P4.0.
 #define EXT_COMP (BIT0) ///< External comparator inputs to P1.0.
@@ -61,4 +64,36 @@ void timer_init(void);
 
 /** @} */
 
-#endif // SETUP_H
+/**
+ * @defgroup led LEDs
+ * @brief Functions for controlling on-board LEDs.
+ * @{
+ */
+
+/**
+ * @brief Write byte to on-board LEDs.
+ *
+ * @param byte : Value to write.
+ * @test See if this works.
+ */
+void led_set(uint8_t byte);
+
+/**
+ * @brief Clear all the on-board LEDs.
+ *
+ * @test See if this works.
+ */
+void led_clear(void);
+
+/** @} */
+
+#ifdef USE_LPM45
+/**
+ * @brief Sets the necessary registers to enter LPM4.5.
+ *
+ * @see Section 1.4 in the 57xx user guide.
+ */
+inline void enter_lpm45(void);
+#endif // USE_LPM45
+
+#endif // UTIL_H

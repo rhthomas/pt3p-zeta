@@ -80,7 +80,7 @@ void Hibernus(void)
 #ifdef USE_SWITCHES
     // Setting threshold VMIN=2.27V
     Set_V(VMIN);// V Restore
-    __delay_cycles(1000);//For setting the external comparator
+    __delay_cycles(1000);// For setting the external comparator
 #endif // USE_SWITCHES
 
     // Restore procedure
@@ -376,35 +376,6 @@ inline void int_rising(void)
     P1IFG = 0; // Clear P1 interrupt flag.
 }
 
-#ifdef USE_LPM45
-void exit_lpm45(void)
-{
-    io_init();
-    clock_init();
-    timer_init();
-}
-
-inline void enter_lpm45(void)
-{
-    // Set all IO ports at GPIO.
-    PASEL0 = 0;
-    PASEL1 = 0;
-    PBSEL0 = 0;
-    PBSEL1 = 0;
-    PJSEL0 = 0;
-    PJSEL1 = 0;
-    // Unlock PMM registers.
-    PMMCTL0_H = 0xA5;
-    // Clear LPM4.5 IFG.
-//    PMMIFG &= ~PMMLPM5IFG;
-    // Disable SVS module.
-    PMMCTL0_L &= ~(SVSHE + SVSLE);
-    // Enter LPM4.5
-    PMMCTL0_L |= PMMREGOFF;
-    __bis_SR_register(LPM4_bits + GIE);
-}
-#endif // USE_LPM45
-
 #pragma vector=PORT1_VECTOR
 __interrupt void PORT1_ISR(void)
 {
@@ -423,18 +394,15 @@ __interrupt void PORT1_ISR(void)
                 Set_V(VMIN + 200);
                 __delay_cycles(500);
 #endif // USE_SWITCHES
-
                 t = (P1IN & BIT0); // t = 1;
                 if (t == 0) {
                     *FLAG_interrupt = 4;
                     int_rising();
-
 #ifdef HIB_DEBUG
                     //For Debugging: LPM
                     P1DIR |= BIT1;
                     P1OUT |= BIT1;
 #endif // HIB_DEBUG
-
                     // Enter sleep state.
 #ifdef USE_LPM45
                     enter_lpm45();
@@ -448,15 +416,12 @@ __interrupt void PORT1_ISR(void)
                     Set_V(value_7);
                     __delay_cycles(1000);
 #endif // USE_SWITCHES
-
                     *FLAG_interrupt = 2;
                     int_falling();
-
 #ifdef HIB_DEBUG
                     P2DIR |= BIT6;
                     P2OUT |= BIT6;
 #endif // HIB_DEBUG
-
                     // Return to active mode with interrupts enabled.
                     __bis_SR_register(GIE);
                     __no_operation();
@@ -470,31 +435,29 @@ __interrupt void PORT1_ISR(void)
 
         if (*FLAG_interrupt == 4) {
 #ifdef HIB_DEBUG
-//            P1OUT &= ~BIT1;
+            P1OUT &= ~BIT1;
 #endif // HIB_DEBUG
-
 #ifdef USE_SWITCHES
             unsigned int value_7 = VMINN;
             Set_V(value_7);
             __delay_cycles(1000);
 #endif // USE_SWITCHES
-
             *FLAG_interrupt = 2;
             int_falling();
-
 #ifdef HIB_DEBUG
             P2DIR |= BIT6;
             P2OUT |= BIT6;
 #endif // HIB_DEBUG
-
             // Return to active mode with interrupts enabled.
             __bis_SR_register(GIE);
             __no_operation();
         }
 
         pro = 0;
+#ifndef USE_LPM45
         // Exit sleep state, processor is active.
         __bic_SR_register_on_exit(LPM4_bits);
+#endif // USE_LPM45
         break;
     default:
         break;

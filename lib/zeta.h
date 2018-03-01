@@ -8,7 +8,7 @@
  * Pin-out:
  * ```
  * MSP430FR5739
- * –––––––+
+ * -------+
  *        |
  * Radio: |
  *    P1.4|<- Interrupt request (nIRQ)
@@ -19,7 +19,7 @@
  *    P1.7|<- Data In (UCB0SOMI)
  *    P2.2|-> Serial Clock Out (UCB0CLK)
  *        |
- * –––––––+
+ * -------+
  * ```
  */
 
@@ -31,9 +31,7 @@
 #include "spi.h"
 
 /**
- * @brief Shutdown pin.
- *
- * P3.3
+ * @brief Shutdown pin (P1.5).
  *
  * | SDN | Radio  |
  * |-----|--------|
@@ -43,9 +41,9 @@
 #define SDN (BIT3)
 
 /**
- * @brief Interrupt request (active low).
+ * @brief Interrupt request P1.4.
  *
- * P1.4
+ * @note Active low.
  */
 #define IRQ (BIT4)
 
@@ -112,11 +110,11 @@ void zeta_ready(void);
  * @brief Set mode of the device [ATM].
  *
  * @param mode : Operating mode of the radio.
- *      | Value | Name  | Description |
- *      |-------|-------|-------------|
- *      | 1     | RX    | ZetaPlus enters RX mode using last RX configured settings.     |
- *      | 2     | Ready | Low power awake state for fast switching between RX/TX (<1ms). |
- *      | 3     | Sleep | Low power sleep mode with register retention.                  |
+ *  | Value | Name  | Description |
+ *  |-------|-------|-------------|
+ *  | 1     | RX    | ZetaPlus enters RX mode using last RX configured settings.     |
+ *  | 2     | Ready | Low power awake state for fast switching between RX/TX (<1ms). |
+ *  | 3     | Sleep | Low power sleep mode with register retention.                  |
  */
 void zeta_select_mode(uint8_t mode);
 
@@ -148,13 +146,13 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4);
  * @brief Set baud-rate between radio and MCU [ATH].
  *
  * @param baud : Data rate between ZetaPlus and MCU.
- *      | `baud` | Data Rate |
- *      |--------|-----------|
- *      | 0      | 9.6kbps   |
- *      | 1      | 19.2kbps (default) |
- *      | 2      | 28.8kbps  |
- *      | 3      | 38.4kbps  |
- *      | 4      | 57.6kbps  |
+ *  | `baud` | Data Rate |
+ *  |--------|-----------|
+ *  | 0      | 9.6kbps   |
+ *  | 1      | 19.2kbps (default) |
+ *  | 2      | 28.8kbps  |
+ *  | 3      | 38.4kbps  |
+ *  | 4      | 57.6kbps  |
  */
 void zeta_set_baud_host(uint8_t baud);
 
@@ -162,14 +160,14 @@ void zeta_set_baud_host(uint8_t baud);
  * @brief Set baud-rate of RF [ATB].
  *
  * @param baud : RF data rate, must be at least double host baud.
- *      | `baud` | RF Rate   |
- *      |--------|-----------|
- *      | 1      | 4.8kbps   |
- *      | 2      | 9.6kbps   |
- *      | 3      | 38.4kbps  |
- *      | 4      | 128.0kbps |
- *      | 5      | 256.0kbps |
- *      | 6      | 500.0kbps |
+ *  | `baud` | RF Rate   |
+ *  |--------|-----------|
+ *  | 1      | 4.8kbps   |
+ *  | 2      | 9.6kbps   |
+ *  | 3      | 38.4kbps  |
+ *  | 4      | 128.0kbps |
+ *  | 5      | 256.0kbps |
+ *  | 6      | 500.0kbps |
  * @note SDN must be toggled high/low for setting to take effect (~15ms).
  * @warning Higher RF baud rate increases BER at longer range.
  */
@@ -190,10 +188,10 @@ void zeta_set_rf_power(uint8_t pwr);
  * @brief Enable data error checking [ATE].
  *
  * @param en : Enable CRC error checking.
- *      | | |
- *      |-|-|
- *      | 0    | Disable error checking (default) |
- *      | 1    | Enable error checking            |
+ *  | | |
+ *  |-|-|
+ *  | 0    | Disable error checking (default) |
+ *  | 1    | Enable error checking            |
  */
 void zeta_enable_crc(uint8_t en);
 

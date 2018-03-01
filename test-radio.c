@@ -1,4 +1,7 @@
-/* Radio reception test.
+/* Unified radio test program.
+ *
+ * Set node as transmitter: #define TXER
+ * Set node as receiver: no definition.
  */
 
 // Libraries.
@@ -6,8 +9,14 @@
 #include "uart.h" // Debugging
 #include "zeta.h" // Radio
 
+//#define TXER ///< Node is transmitter.
+
+#ifdef TXER
+uint8_t msg[5u] = {'H', 'E', 'L', 'L', 'O'};
+#else
 uint8_t in_packet[5u + 4u]; ///< Array for received data.
 uint8_t count;
+#endif
 
 void main(void)
 {
@@ -22,12 +31,26 @@ void main(void)
     spi_init();
     zeta_init();
 
+    __bis_SR_register(GIE);
+
+#ifdef TXER
+    // Set ready mode.
+    zeta_select_mode(2u);
+#else
     // Set Rx mode.
     zeta_select_mode(1);
+#endif // TXER
 
     // Main loop.
     while (1) {
-        __bis_SR_register(GIE);
+#ifdef TXER
+        // Go to sleep. Wait for timer interrupt.
+        __bis_SR_register(LPM3_bits | GIE);
+        // Send packet. Returns to previous state (sleep) when done.
+//        zeta_get_vers();
+        zeta_get_settings();
+        zeta_send_packet(msg, sizeof(msg));
+#else
         // Operating on channel 0 with packet size of 12 bytes.
         zeta_rx_mode(CHANNEL, 5u + 4u);
         // Get incoming packet.
@@ -39,6 +62,7 @@ void main(void)
             uart_putc(in_packet[count]);
             in_packet[count] = 'x';
         }
+#endif // TXER
     }
 }
 
@@ -46,5 +70,10 @@ void main(void)
 __interrupt void TIMER0_ISR(void)
 {
     P3OUT ^= BIT7;
+#ifdef TXER
+    // Exit into active mode and disable interrupts while Tx'ing.
+    __bic_SR_register_on_exit(LPM3_bits | GIE);
+#else
     uart_puts("Listening...\r\n");
+#endif // TXER
 }

@@ -34,12 +34,11 @@
 #define HIBERNATION_H
 
 #include <msp430.h>
-#include "setup.h"
+#include "util.h"
 
-// Config defines.
+// Hibernus configuration.
 //#define USE_SWITCHES ///< Use switches to change trigger point of comparator.
 //#define HIB_DEBUG ///< Debug hibernus with specific I/O outputs.
-//#define USE_LPM45 ///< When sleeping, go as low as LPM4.5.
 
 // Interrupt and restoring.
 #define INT   (0xEDD8) ///< Address storing the interrupt flag.
@@ -58,8 +57,8 @@
 
 // Threshold.
 #ifdef USE_SWITCHES
-#define VMIN  (2270) ///<
-#define VMINN (2170) ///<
+#define VMIN  (2270) ///< Restore threshold.
+#define VMINN (2170) ///< Hibernate threshold.
 #endif // USE_SWITCHES
 
 /**
@@ -127,16 +126,6 @@ inline void int_falling(void);
  * @brief Set up P1.0 interrupt on the rising edge.
  */
 inline void int_rising(void);
-
-/**
- *
- */
-void exit_lpm45(void);
-
-/**
- *
- */
-inline void enter_lpm45(void);
 
 /**
  * @brief ISR for external comparator trigger.

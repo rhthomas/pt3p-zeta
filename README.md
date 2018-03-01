@@ -88,10 +88,11 @@ compiled Doxygen is available [here](https://rhthomas.github.io/docs/zeta).
 - [ ] Receive packet over RF.
 - [ ] Wake-up node over RF with UB20.
 - [ ] Write unified `main.c` program.
-	- [x] Incorporate Hibernus.
+	- [ ] Incorporate Hibernus.
     	- [x] Test comparator.
     	- [x] Test Hibernus in isolation.
 		- [x] Remove clashes with clock/pin initialisation *(change as per the
               above pinout diagram)*.
+        - [ ] Sleep hibernus test in LPM4.5.
 	- [ ] Incorporate RESTOP.
 - [ ] Optimise code *(more ISRs and use DMA)*.

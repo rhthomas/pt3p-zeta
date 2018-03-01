@@ -1,20 +1,12 @@
-/**
- * @file test-radio-tx.c
- * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-02-10
- *
- * @brief Testing transmission on the radio module.
+/* Radio transmission test.
  */
 
 // Libraries.
-#include "setup.h" // System setup functions
+#include "util.h" // System setup functions
 #include "zeta.h" // Radio
 
 uint8_t msg[5u] = {'H', 'E', 'L', 'L', 'O'};
 
-/**
- * @brief Main loop.
- */
 void main(void)
 {
     // Stop watchdog timer.
@@ -40,12 +32,6 @@ void main(void)
     }
 }
 
-/**
- * @brief Timer overflow ISR.
- *
- * Triggers every ~1s and exits the processor from LPM3. The MCU then sends a
- * packet onto the ether, sleeps the radio and returns to LPM3.
- */
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void TIMER0_ISR(void)
 {

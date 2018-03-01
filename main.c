@@ -1,39 +1,4 @@
-/**
- * @file main.c
- * @author Rhys Thomas <rt8g15@soton.ac.uk>
- * @date 2018-02-09
- *
- * @brief Combined code of all modules, demonstrating the project solution.
- */
-
-#include "setup.h" // System setup functions
-#include "uart.h" // Debugging
-#include "zeta.h" // Radio
-#include "hibernation.h" // Hibernus++
-//#include "RESTOP_func.h" // RESTOP add-on
-//#include "Config.h" // RESTOP configuration
-
-uint8_t in_packet[5u + 4u]; ///< Array for received data.
-
-/**
- * @brief Call initialisation functions.
- *
- * Used when exiting LPM4.5 in the ISR.
- *
- * @see low_power_mode_4_5
- * @see PORT4_ISR
- */
-void setup(void);
-
-/**
- * @brief Sets the necessary registers to enter LPM4.5.
- *
- * @see Section 1.4 in the 57xx user guide.
- */
-inline void low_power_mode_4_5(void);
-
-/**
- * @brief Main loop.
+/* Unified main file for project operation.
  *
  * The operation is described as follows:
  * 1. Initialise I/O ports and clock settings.
@@ -48,39 +13,22 @@ inline void low_power_mode_4_5(void);
  * 8. MCU then handles the radio reception and returns to LPM4.5 (repeat
  *    indefinitely from 6).
  */
+
+#include "util.h" // System setup functions
+#include "uart.h" // Debugging
+#include "zeta.h" // Radio
+#include "hibernation.h" // Hibernus++
+//#include "RESTOP_func.h" // RESTOP add-on
+//#include "Config.h" // RESTOP configuration
+
+uint8_t in_packet[5u + 4u]; ///< Array for received data.
+
 void main(void)
 {
     // Stop watchdog timer.
     WDTCTL = WDTPW | WDTHOLD;
+    PM5CTL0 &= ~LOCKLPM5;
 
-    // Setup peripherals.
-    setup();
-
-    // Main loop.
-    while (1) {
-        // Go to sleep and wait for interrupt from UB20.
-#ifdef USE_LPM_4_5
-        low_power_mode_4_5();
-#else
-        __bis_SR_register(LPM4_bits + GIE);
-#endif // USE_LPM_4_5
-        // Set Rx mode.
-        zeta_select_mode(1);
-        // Operating on channel 0 with packet size of 9 bytes.
-        zeta_rx_mode(CHANNEL, (5u + 4u));
-        // Get incoming packet.
-        zeta_rx_packet(in_packet);
-        // Short delay after Rx'ing packet.
-        __delay_cycles(48e4); // ~0.020s
-        // Put radio to sleep.
-        zeta_select_mode(3);
-        // Re-enable UB20 interrupt when finished.
-        P4IE = UB20;
-    }
-}
-
-void setup(void)
-{
     io_init();
     clock_init();
     Hibernus();
@@ -88,42 +36,55 @@ void setup(void)
     spi_init();
     zeta_init();
     /// @todo Add RESTOP commands for ZetaPlus startup.
-}
 
-inline void low_power_mode_4_5(void)
-{
-    // Enable interrupts.
     __bis_SR_register(GIE);
-    // Unlock PMM registers.
-    PMMCTL0_H = 0xA5;
-    // Disable SVS module.
-    PMMCTL0_L &= ~(SVSHE + SVSLE);
-    // Clear LPM4.5 IFG.
-    PMMIFG &= ~PMMLPM5IFG;
-    // Enter LPM4.5
-    PMMCTL0_L |= PMMREGOFF;
-    __bis_SR_register(LPM4_bits);
+
+#ifdef USE_LPM45
+    if (SYSRSTIV == SYSRSTIV_LPM5WU) {
+        // System woke-up from LPM4.5.
+        // Continue to while loop and receive packet.
+    } else {
+        // System woke-up from "cold start".
+        // Sleep and wait for interrupt from UB20.
+        enter_lpm45();
+    }
+#endif // USE_LPM45
+
+    // Main loop.
+    while (1) {
+        // Set Rx mode.
+        zeta_select_mode(1);
+        // Operating on channel 0 with packet size of 9 bytes.
+        zeta_rx_mode(CHANNEL, (5u + 4u));
+        // Get incoming packet.
+        zeta_rx_packet(in_packet);
+        // Short delay after Rx'ing packet.
+        /// @todo Is this necessary?
+        __delay_cycles(48e4); // ~0.020s
+        // Put radio to sleep.
+        zeta_select_mode(3);
+#ifdef USE_LPM45
+        // Go to sleep and wait for next interrupt from UB20.
+        enter_lpm45();
+#else
+        // Re-enable UB20 interrupt when finished.
+        P4IE = UB20;
+        // Go to sleep and wait for next interrupt from UB20.
+        __bis_SR_register(LPM4_bits + GIE);
+#endif // USE_LPM45
+    }
 }
 
-/**
- * @brief ISR that is triggered by UB20.
- *
+#ifndef USE_LPM45
+/*
  * Used for waking up the processor, this ISR clears the LPM4 bits which puts
  * the processor back into active mode. When leaving the ISR, the code then
  * continues from after __bis_SR_register, of which contains the radio code
  * (does the talking/listening).
- *
- * @todo Exit LPM4.5 code? Reconfigure IO, system and unlock the system.
  */
 #pragma vector=PORT4_VECTOR
 __interrupt void PORT4_ISR(void)
 {
-#ifdef USE_LPM_4_5
-    // Unlock the system
-    PM5CTL0 &= ~LOCKLPM5;
-    // Reconfigure system and IO as required for the application.
-    setup();
-#endif // USE_LPM_4_5
     switch (__even_in_range(P4IV, P4IV_P4IFG0)) {
     case P4IV_P4IFG0:
         // Clear P4.0 interrupt flag.
@@ -137,3 +98,4 @@ __interrupt void PORT4_ISR(void)
         break;
     }
 }
+#endif // USE_LPM45
