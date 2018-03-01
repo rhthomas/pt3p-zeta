@@ -20,6 +20,7 @@ void io_init(void)
     /* Set external comparator on P1.0 as input (no pull-up) with interrupts
      * enabled.
      */
+    P1IFG = 0;
     P1DIR &= ~(EXT_COMP); // Set P1.0 as an input.
     P1REN &= ~(EXT_COMP); // Disable pull resistors.
     P1IE |= EXT_COMP;
@@ -65,16 +66,15 @@ void led_clear(void)
 #ifdef USE_LPM45
 inline void enter_lpm45(void)
 {
-    // Enable interrupts.
-    __bis_SR_register(GIE);
     // Unlock PMM registers.
     PMMCTL0_H = 0xA5;
     // Disable SVS module.
     PMMCTL0_L &= ~(SVSHE + SVSLE);
-    // Clear LPM4.5 IFG.
-    PMMIFG &= ~PMMLPM5IFG;
     // Enter LPM4.5
     PMMCTL0_L |= PMMREGOFF;
-    __bis_SR_register(LPM4_bits);
+    // Lock PMM registers.
+    PMMCTL0_H = 0;
+    // Enter LPM4.5
+    __bis_SR_register(LPM4_bits + GIE);
 }
 #endif // USE_LPM45

@@ -11,7 +11,7 @@
  * -------+
  *        |
  *    P1.0|<- External comparator (INT).
- *    P1.1|<- UB20M power-gated output (INT).
+ *    P4.0|<- UB20M power-gated output (INT).
  *        |
  * -------+
  * ```

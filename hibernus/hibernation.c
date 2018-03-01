@@ -229,7 +229,6 @@ void Restore(void)
     // Debugging: Restore finished.
     P1OUT &= ~BIT3;
 #endif
-
 #ifdef USE_SWITCHES
     // Setting the comparator with the Hibernate threshold
     unsigned int hibernate_3 = (unsigned int)(VMINN);//for debug
