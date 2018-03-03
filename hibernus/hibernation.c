@@ -90,11 +90,11 @@ void Hibernus(void)
         *FLAG_interrupt = 1;
         int_rising();
 
-#ifdef USE_LPM45
-        enter_lpm45();
+#ifdef USE_LPM5
+        enter_lpm5(4);
 #else
         __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
-#endif // USE_LPM45
+#endif // USE_LPM5
         __no_operation();
     }
 
@@ -403,11 +403,11 @@ __interrupt void PORT1_ISR(void)
                     P1OUT |= BIT1;
 #endif // HIB_DEBUG
                     // Enter sleep state.
-#ifdef USE_LPM45
-                    enter_lpm45();
+#ifdef USE_LPM5
+                    enter_lpm5(4);
 #else
                     __bis_SR_register(LPM4_bits + GIE);
-#endif // USE_LPM45
+#endif // USE_LPM5
                     __no_operation();
                 } else {
 #ifdef USE_SWITCHES
@@ -453,10 +453,8 @@ __interrupt void PORT1_ISR(void)
         }
 
         pro = 0;
-#ifndef USE_LPM45
         // Exit sleep state, processor is active.
         __bic_SR_register_on_exit(LPM4_bits);
-#endif // USE_LPM45
         break;
     default:
         break;

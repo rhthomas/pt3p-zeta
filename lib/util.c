@@ -10,9 +10,6 @@ void io_init(void)
     PAOUT = 0;
     PBOUT = 0;
     PJOUT = 0;
-    // Reset interrupt flags.
-    PAIFG = 0;
-    PBIFG = 0;
     // Set UB20 on P4.0 as input (no pull-up) with interrupts enabled.
 //    P4DIR &= ~(UB20);
 //    P4REN &= ~(UB20);
@@ -20,7 +17,6 @@ void io_init(void)
     /* Set external comparator on P1.0 as input (no pull-up) with interrupts
      * enabled.
      */
-    P1IFG = 0;
     P1DIR &= ~(EXT_COMP); // Set P1.0 as an input.
     P1REN &= ~(EXT_COMP); // Disable pull resistors.
     P1IE |= EXT_COMP;
@@ -38,6 +34,10 @@ void clock_init(void)
     CSCTL3 = DIVA_0 + DIVS_3 + DIVM_0;
     // Power down unused clocks (used for LPM4.5).
     CSCTL4 = XT1OFF + XT2OFF;
+//    do {
+//        CSCTL5 &= ~XT1OFFG; // Clear XT1 fault flag
+//        SFRIFG1 &= ~OFIFG;
+//    } while (SFRIFG1 & OFIFG); // Test oscillator fault flag
     // Lock clock registers.
     CSCTL0_H = 0;
 }
@@ -47,8 +47,19 @@ void timer_init(void)
     // ACLK, upmode, clear.
     TA0CTL |= (TASSEL__ACLK | MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-//    TA0CCR0 = 0x2711; // ~1s delay.
-    TA0CCR0 = 0x0400; // ~1s delay.
+    TA0CCR0 = 0x2711; // ~1s delay.
+}
+
+void rtc_init(void)
+{
+    // Configure RTC_B
+    // Configure BCD mode, stop the RTC, and enable RTC
+    RTCCTL01 = RTCBCD | RTCHOLD | RTCTEV_0;
+    // Set the RTC second stage divider to 256
+    // RTC interrupts every 2 seconds
+    RTCPS1CTL = RT1IP_7 | RT1PSIE;
+    // Start RTC calendar mode
+    RTCCTL01 &= ~RTCHOLD;
 }
 
 void led_set(uint8_t byte)
@@ -63,8 +74,8 @@ void led_clear(void)
     P3OUT = 0;
 }
 
-#ifdef USE_LPM45
-inline void enter_lpm45(void)
+#ifdef USE_LPM5
+inline void enter_lpm5(uint8_t mode)
 {
     // Unlock PMM registers.
     PMMCTL0_H = 0xA5;
@@ -75,6 +86,22 @@ inline void enter_lpm45(void)
     // Lock PMM registers.
     PMMCTL0_H = 0;
     // Enter LPM4.5
-    __bis_SR_register(LPM4_bits + GIE);
+    if (mode == 3) {
+        __bis_SR_register(LPM3_bits + GIE);
+    } else if (mode == 4) {
+        __bis_SR_register(LPM4_bits + GIE);
+    }
+}
+
+inline void exit_lpm5(void)
+{
+    // Re-configure / start RTC
+    // Configure BCD mode, stop the RTC, and enable RTC
+    RTCCTL1 |= RTCBCD | RTCHOLD | RTCTEV_0;
+    // Set the RTC second stage divider to 256
+    // RTC interrupts every 2 seconds
+    RTCPS1CTL = RT1IP_7 | RT1PSIE;
+    // Start RTC calendar mode
+    RTCCTL1 &= ~RTCHOLD;
 }
 #endif // USE_LPM45

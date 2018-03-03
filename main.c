@@ -25,10 +25,13 @@ uint8_t in_packet[5u + 4u]; ///< Array for received data.
 
 void main(void)
 {
+    // <- Exit from LPMx.5 starts here.
+
     // Stop watchdog timer.
     WDTCTL = WDTPW | WDTHOLD;
     PM5CTL0 &= ~LOCKLPM5;
 
+    // System setup.
     io_init();
     clock_init();
     Hibernus();
@@ -37,21 +40,53 @@ void main(void)
     zeta_init();
     /// @todo Add RESTOP commands for ZetaPlus startup.
 
-    __bis_SR_register(GIE);
-
-#ifdef USE_LPM45
     if (SYSRSTIV == SYSRSTIV_LPM5WU) {
-        // System woke-up from LPM4.5.
-        // Continue to while loop and receive packet.
+        // System woke-up from LPMx.5.
+        exit_lpm5();
+        // RTC/UB20 ISR will now trigger.
+        __bis_SR_register(GIE);
     } else {
         // System woke-up from "cold start".
         // Sleep and wait for interrupt from UB20.
-        enter_lpm45();
+        rtc_init();
+        __bis_SR_register(GIE);
+        enter_lpm5();
     }
-#endif // USE_LPM45
 
-    // Main loop.
-    while (1) {
+    // Enter necessary ISR.
+    // ...
+    // Return here.
+
+    // Go to sleep and wait for next interrupt from UB20 or RTC.
+    enter_lpm5(3);
+}
+
+/* Node sleeps when not receiving or transmitting data. When the timer pops,
+ * sample any connected sensors, construct a packet and transmit it.
+ */
+#pragma vector=RTC_VECTOR
+__interrupt void RTC_ISR(void)
+{
+    switch (__even_in_range(RTCIV, RTCIV_RT1PSIFG)) {
+    case RTCIV_RT1PSIFG:
+        // Sample sensor.
+        // Construct packet.
+        // Transmit.
+        /// @test RTC is waking CPU from sleep.
+        led_set(0xFF);
+        break;
+    default:
+        break;
+    }
+}
+
+/* Triggers when there is a packet incoming.
+ */
+#pragma vector=PORT4_VECTOR
+__interrupt void PORT4_ISR(void)
+{
+    switch (__even_in_range(P4IV, P4IV_P4IFG0)) {
+    case P4IV_P4IFG0:
         // Set Rx mode.
         zeta_select_mode(1);
         // Operating on channel 0 with packet size of 9 bytes.
@@ -63,39 +98,8 @@ void main(void)
         __delay_cycles(48e4); // ~0.020s
         // Put radio to sleep.
         zeta_select_mode(3);
-#ifdef USE_LPM45
-        // Go to sleep and wait for next interrupt from UB20.
-        enter_lpm45();
-#else
-        // Re-enable UB20 interrupt when finished.
-        P4IE = UB20;
-        // Go to sleep and wait for next interrupt from UB20.
-        __bis_SR_register(LPM4_bits + GIE);
-#endif // USE_LPM45
-    }
-}
-
-#ifndef USE_LPM45
-/*
- * Used for waking up the processor, this ISR clears the LPM4 bits which puts
- * the processor back into active mode. When leaving the ISR, the code then
- * continues from after __bis_SR_register, of which contains the radio code
- * (does the talking/listening).
- */
-#pragma vector=PORT4_VECTOR
-__interrupt void PORT4_ISR(void)
-{
-    switch (__even_in_range(P4IV, P4IV_P4IFG0)) {
-    case P4IV_P4IFG0:
-        // Clear P4.0 interrupt flag.
-        P4IFG &= ~UB20;
-        // Disable interrupts.
-        P4IE &= ~UB20;
-        // Clear LPM4 bits on exit from ISR.
-        __bic_SR_register_on_exit(LPM4_bits);
         break;
     default:
         break;
     }
 }
-#endif // USE_LPM45

@@ -24,7 +24,7 @@
 #include <stdint.h>
 
 // Config defines.
-#define USE_LPM45 ///< When sleeping, go as low as LPM4.5.
+#define USE_LPM5 ///< When sleeping, go as low as LPM4.5.
 
 #define UB20     (BIT0) ///< UB20 interrupt comes from P4.0.
 #define EXT_COMP (BIT0) ///< External comparator inputs to P1.0.
@@ -62,6 +62,11 @@ void clock_init(void);
  */
 void timer_init(void);
 
+/**
+ *
+ */
+void rtc_init(void);
+
 /** @} */
 
 /**
@@ -87,13 +92,19 @@ void led_clear(void);
 
 /** @} */
 
-#ifdef USE_LPM45
+#ifdef USE_LPM5
 /**
- * @brief Sets the necessary registers to enter LPM4.5.
+ * @brief Sets the necessary registers to enter LPMx.5.
  *
+ * @param mode : LPM3.5 or LPM4.5?
  * @see Section 1.4 in the 57xx user guide.
  */
-inline void enter_lpm45(void);
+inline void enter_lpm5(uint8_t mode);
+
+/**
+ *
+ */
+inline void exit_lpm5(void);
 #endif // USE_LPM45
 
 #endif // UTIL_H

@@ -103,6 +103,7 @@ void zeta_ready(void);
  * @brief Functions to configure the radio settings (i.e. channel, mode etc).
  * @note All configuration functions end with a 20ms delay.
  * @test Whats the shortest delay we can have?
+ * @test Is the delay required?
  * @{
  */
 
@@ -137,7 +138,7 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength);
  * @param sync2 : Byte 2.
  * @param sync3 : Byte 3.
  * @param sync4 : Byte 4.
- * @note Set all to `0xAA` if not required.
+ * @note Set byte to `0xAA` if not required.
  * @note Reverse order bytes, i.e. `2B`=`D4`, `D4`=`2B`.
  */
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4);
@@ -291,11 +292,11 @@ uint8_t zeta_read_byte(void);
 /**
  * @brief Read packet from FIFO loop until empty.
  *
- * * '#'
- * * 'R'
- * * RSSI
- * * Length
- * * Packet
+ * * '#' - Shows the start of a new packet.
+ * * 'R' - Shows the start of a new packet.
+ * * Length - Length of received packet.
+ * * RSSI - Received signal strength indicator.
+ * * Packet - The received packet.
  *
  * @param[out] packet : Array to return Rx'd packet to.
  * @test Confirm that this works as expected.

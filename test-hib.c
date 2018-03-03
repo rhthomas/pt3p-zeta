@@ -20,18 +20,24 @@ void main(void)
     // Initialise the system.
     io_init();
     clock_init();
-    Hibernus();
-    __bis_SR_register(GIE);
 
-#ifdef USE_LPM45
+#ifdef USE_LPM5
     if (SYSRSTIV == SYSRSTIV_LPM5WU) {
         // System woke-up from LPM4.5.
-        // ...
+        // External ISR should trigger now.
+        __bis_SR_register(GIE);
+        // Interrupt may have been missed, call ISR manually.
+        // PORT1_ISR();
+        // /// @note There must be a better way of doing this?
     } else {
         // System woke-up from "cold start".
         // ...
     }
-#endif // USE_LPM45
+#endif // USE_LPM5
+
+    // Begin hibernus.
+    Hibernus();
+    __bis_SR_register(GIE);
 
     uint8_t n;
     while (1) {
