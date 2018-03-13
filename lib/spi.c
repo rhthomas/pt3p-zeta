@@ -9,7 +9,7 @@ void spi_init(void)
 
     // Secondary functionality of pins.
     P2SEL1 |= SCLK;
-//    P1SEL1 |= CS;
+    P1SEL1 |= CS;
     P1SEL1 |= (MOSI | MISO);
 
     // Reset state-machine.
@@ -23,7 +23,7 @@ void spi_init(void)
      * x. Active low. (not used, now manual)
      * 5. SMCLK as source. */
     UCB0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
-//    UCB0CTLW0 |= (UCMODE1 | UCSTEM);
+    UCB0CTLW0 |= (UCMODE1 | UCSTEM);
     UCB0CTLW0 |= UCSSEL_2;
     // Run the SPI clk at 1MHz.
     UCB0BRW_L = 3;

@@ -57,15 +57,37 @@ void io_init(void);
  */
 void clock_init(void);
 
+/** @} */
+
+/**
+ * @defgroup timers Timers
+ * @brief Control of timer module.
+ * @{
+ */
+
 /**
  * @brief Setup timer for periodic transmissions.
+ *
+ * @ingroup init
  */
 void timer_init(void);
 
 /**
- *
+ * @brief Start running the timer.
  */
-void rtc_init(void);
+inline void timer_start(void);
+
+/**
+ * @brief Halt the timer.
+ */
+inline void timer_stop(void);
+
+/**
+ * @brief Reset the count of the timer.
+ *
+ * Used in the timeout functionality.
+ */
+inline void timer_reset(void);
 
 /** @} */
 
@@ -100,11 +122,6 @@ void led_clear(void);
  * @see Section 1.4 in the 57xx user guide.
  */
 inline void enter_lpm5(uint8_t mode);
-
-/**
- *
- */
-inline void exit_lpm5(void);
-#endif // USE_LPM45
+#endif // USE_LPM5
 
 #endif // UTIL_H

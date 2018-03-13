@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <msp430.h>
 #include "spi.h"
+#include "util.h"
 
 /**
  * @brief Shutdown pin (P1.5).
@@ -38,7 +39,7 @@
  * | 0   | Active |
  * | 1   | Shutdown (no register retention) |
  */
-#define SDN (BIT3)
+#define SDN (BIT5)
 
 /**
  * @brief Interrupt request P1.4.
@@ -102,7 +103,7 @@ void zeta_ready(void);
  * @defgroup config Radio Configuration
  * @brief Functions to configure the radio settings (i.e. channel, mode etc).
  * @note All configuration functions end with a 20ms delay.
- * @test Whats the shortest delay we can have?
+ * @test What's the shortest delay we can have?
  * @test Is the delay required?
  * @{
  */
