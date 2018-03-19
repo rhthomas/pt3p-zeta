@@ -24,9 +24,10 @@
 #include <stdint.h>
 
 // Config defines.
-#define USE_LPM5 ///< When sleeping, go as low as LPM4.5.
+// #define USE_LPM5 ///< When sleeping, go as low as LPM4.5.
+#define USE_SHDN ///< When done, shutdown the processor.
 
-#define PS_LATCH (BIT0) ///< Power-supply latch output.
+#define PS_LATCH (BIT0) ///< Power-supply latch output on P4.0.
 #define EXT_COMP (BIT0) ///< External comparator inputs to P1.0.
 
 /**
@@ -51,9 +52,7 @@ void io_init(void);
  * |-------|--------|-------|
  * | MCLK  | DCO    | 24MHz |
  * | SMCLK | DCO    | 3MHz  |
- * | ACLK  | DCO    | 10kHz |
- *
- * @bug Clocks are being weird.
+ * | ACLK  | VLO    | 10kHz |
  */
 void clock_init(void);
 
@@ -118,12 +117,12 @@ void led_clear(void);
 /**
  * @brief Sets the necessary registers to enter LPMx.5.
  *
- * @param mode : LPM3.5 or LPM4.5?
  * @see Section 1.4 in the 57xx user guide.
  */
-inline void enter_lpm5(uint8_t mode);
+inline void enter_lpm5(void);
 #endif // USE_LPM5
 
+#ifdef USE_SHDN
 /**
  * @brief Release latch to power-supply.
  *
@@ -131,5 +130,6 @@ inline void enter_lpm5(uint8_t mode);
  * that is called, regardless of what mode of operation is running.
  */
 inline void power_off(void);
+#endif // USE_SHDN
 
 #endif // UTIL_H

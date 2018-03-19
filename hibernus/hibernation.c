@@ -91,7 +91,9 @@ void Hibernus(void)
         int_rising();
 
 #ifdef USE_LPM5
-        enter_lpm5(4);
+        enter_lpm5();
+#elif USE_SHDN
+        power_off();
 #else
         __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
 #endif // USE_LPM5
@@ -404,7 +406,9 @@ __interrupt void PORT1_ISR(void)
 #endif // HIB_DEBUG
                     // Enter sleep state.
 #ifdef USE_LPM5
-                    enter_lpm5(4);
+                    enter_lpm5();
+#elif USE_SHDN
+                    power_off();
 #else
                     __bis_SR_register(LPM4_bits + GIE);
 #endif // USE_LPM5

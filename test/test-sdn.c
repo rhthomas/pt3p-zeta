@@ -6,7 +6,6 @@
 #include <msp430.h>
 
 #include "util.h"
-#include "hibernation.h"
 
 void main(void)
 {

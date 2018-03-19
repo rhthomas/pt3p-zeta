@@ -11,7 +11,7 @@ void io_init(void)
     PBOUT = 0;
     PJOUT = 0;
     // Set power-supply latch as output, and immediately drive high.
-    P4DIR |= PS_LATCH;
+    // P4DIR |= PS_LATCH;
     P4OUT |= PS_LATCH;
     /* Set external comparator on P1.0 as input (no pull-up) with interrupts
      * enabled.
@@ -30,8 +30,8 @@ void clock_init(void)
     // ACLK = VLO, SMCLK = MCLK = DCO
     CSCTL2 = SELA_1 + SELS_3 + SELM_3;
     // ACLK/1, SMCLK/8, MCLK/1
-    CSCTL3 = DIVA_0 + DIVS_3 + DIVM_0;
-    // Power down unused clocks (used for LPM4.5).
+    CSCTL3 |= DIVA_0 + DIVS_3 + DIVM_0;
+    // Power down unused clocks.
     CSCTL4 = XT1OFF + XT2OFF;
     // Lock clock registers.
     CSCTL0_H = 0;
@@ -74,7 +74,7 @@ void led_clear(void)
 }
 
 #ifdef USE_LPM5
-inline void enter_lpm5(uint8_t mode)
+inline void enter_lpm5(void)
 {
     // Unlock PMM registers.
     PMMCTL0_H = 0xA5;
@@ -85,15 +85,13 @@ inline void enter_lpm5(uint8_t mode)
     // Lock PMM registers.
     PMMCTL0_H = 0;
     // Enter LPM4.5
-    if (mode == 3) {
-        __bis_SR_register(LPM3_bits + GIE);
-    } else if (mode == 4) {
-        __bis_SR_register(LPM4_bits + GIE);
-    }
+    __bis_SR_register(LPM4_bits + GIE);
 }
 #endif // USE_LPM5
 
+#ifdef USE_SHDN
 inline void power_off(void)
 {
-    P4OUT &= ~BIT0;
+    P4OUT &= ~PS_LATCH;
 }
+#endif // USE_SHDN

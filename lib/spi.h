@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <msp430.h>
 
+#define MANUAL
+
 #define CS   (BIT3) ///< Chip select pin for SPI (P1.3).
 #define SCLK (BIT2) ///< SPI clock (P2.2).
 #define MISO (BIT7) ///< Master-in/Slave-out (P1.7).
@@ -56,11 +58,11 @@ uint8_t spi_xfer(uint8_t byte);
 /**
  * @brief Set the chip select pin high.
  */
-void spi_cs_high(void);
+inline void spi_cs_high(void);
 
 /**
  * @brief Set the chip select pin low.
  */
-void spi_cs_low(void);
+inline void spi_cs_low(void);
 
 #endif // SPI_H

@@ -1,16 +1,20 @@
 #include "spi.h"
 
-void spi_init(void)
+void spi_init(uint8_t fast)
 {
     P1DIR |= (MOSI + CS);
     P1DIR &= ~MISO;
-//    P1OUT |= CS;
     P2DIR |= SCLK;
 
     // Secondary functionality of pins.
     P2SEL1 |= SCLK;
-//    P1SEL1 |= CS;
     P1SEL1 |= (MOSI | MISO);
+
+    // Set automatic CS pin.
+#ifndef MANUAL
+    P1OUT |= CS;
+    P1SEL1 |= CS;
+#endif // MANUAL
 
     // Reset state-machine.
     UCB0CTLW0 |= UCSWRST;
@@ -23,7 +27,10 @@ void spi_init(void)
      * x. Active low. (not used, now manual)
      * 5. SMCLK as source. */
     UCB0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
+    // TODO You've commented this out without testing.
+#ifndef MANUAL
     UCB0CTLW0 |= (UCMODE1 | UCSTEM);
+#endif // MANUAL
     UCB0CTLW0 |= UCSSEL_2;
     // Run the SPI clk at 1MHz.
     UCB0BRW_L = 3;
@@ -41,12 +48,12 @@ uint8_t spi_xfer(uint8_t byte)
     return UCB0RXBUF;
 }
 
-void spi_cs_high(void)
+inline void spi_cs_high(void)
 {
     P1OUT |= CS;
 }
 
-void spi_cs_low(void)
+inline void spi_cs_low(void)
 {
     P1OUT &= ~CS;
 }
