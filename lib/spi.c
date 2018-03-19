@@ -4,12 +4,12 @@ void spi_init(void)
 {
     P1DIR |= (MOSI + CS);
     P1DIR &= ~MISO;
-    P1OUT |= CS;
+//    P1OUT |= CS;
     P2DIR |= SCLK;
 
     // Secondary functionality of pins.
     P2SEL1 |= SCLK;
-    P1SEL1 |= CS;
+//    P1SEL1 |= CS;
     P1SEL1 |= (MOSI | MISO);
 
     // Reset state-machine.

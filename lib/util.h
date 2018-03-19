@@ -26,7 +26,7 @@
 // Config defines.
 #define USE_LPM5 ///< When sleeping, go as low as LPM4.5.
 
-#define UB20     (BIT0) ///< UB20 interrupt comes from P4.0.
+#define PS_LATCH (BIT0) ///< Power-supply latch output.
 #define EXT_COMP (BIT0) ///< External comparator inputs to P1.0.
 
 /**
@@ -123,5 +123,13 @@ void led_clear(void);
  */
 inline void enter_lpm5(uint8_t mode);
 #endif // USE_LPM5
+
+/**
+ * @brief Release latch to power-supply.
+ *
+ * @note The latch is driven high in io_init() and is the first setup function
+ * that is called, regardless of what mode of operation is running.
+ */
+inline void power_off(void);
 
 #endif // UTIL_H

@@ -10,10 +10,9 @@ void io_init(void)
     PAOUT = 0;
     PBOUT = 0;
     PJOUT = 0;
-    // Set UB20 on P4.0 as input (no pull-up) with interrupts enabled.
-//    P4DIR &= ~(UB20);
-//    P4REN &= ~(UB20);
-//    P4IE |= UB20;
+    // Set power-supply latch as output, and immediately drive high.
+    P4DIR |= PS_LATCH;
+    P4OUT |= PS_LATCH;
     /* Set external comparator on P1.0 as input (no pull-up) with interrupts
      * enabled.
      */
@@ -93,3 +92,8 @@ inline void enter_lpm5(uint8_t mode)
     }
 }
 #endif // USE_LPM5
+
+inline void power_off(void)
+{
+    P4OUT &= ~BIT0;
+}

@@ -238,7 +238,7 @@ void zeta_get_vers(void);
  * @note To see output, attach Saleae.
  * @ingroup debug
  */
-void zeta_get_settings(void);
+void zeta_get_settings(uint8_t settings[]);
 
 /**
  * @defgroup tx Transmission
