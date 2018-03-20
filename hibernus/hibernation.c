@@ -22,7 +22,7 @@ int t;
 
 #pragma SET_DATA_SECTION()
 
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
 /// Trigger voltage of the external comparator.
 const unsigned int vol[256] = {
     1966, 1973, 1979, 1986, 1992, 1999, 2006, 2012, 2019, 2025, 2032, 2038,
@@ -77,7 +77,7 @@ unsigned int i;
 
 void Hibernus(void)
 {
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
     // Setting threshold VMIN=2.27V
     Set_V(VMIN);// V Restore
     __delay_cycles(1000);// For setting the external comparator
@@ -90,10 +90,11 @@ void Hibernus(void)
         *FLAG_interrupt = 1;
         int_rising();
 
-#ifdef USE_LPM5
+#if defined(USE_LPM5)
         enter_lpm5();
-#elif USE_SHDN
+#elif defined(USE_SHDN)
         power_off();
+        __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
 #else
         __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
 #endif // USE_LPM5
@@ -104,7 +105,7 @@ void Hibernus(void)
     if (*CC_Check == 0) {
         *CC_Check = 0;
 
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
         unsigned int hibernate_2 = (unsigned int)(VMINN); // threshold for hibernate 2.17V
         Set_V(hibernate_2);
         __delay_cycles(1000);
@@ -121,7 +122,7 @@ void Hibernus(void)
     if ((*CC_Check != 0) && (*CC_Check != 1)) {
         *CC_Check = 0;
 
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
         unsigned int hibernate = (unsigned int)(VMINN); //threshold for hibernate 2.17V
         Set_V(hibernate);
         __delay_cycles(1000);
@@ -136,7 +137,7 @@ void Hibernus(void)
 
     // If you have to restore a previous state.
     if (*CC_Check == 1) {
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
         // Debugging: Restore
         P1DIR |= BIT3;
         P1OUT |= BIT3;
@@ -148,7 +149,7 @@ void Hibernus(void)
 
 void Hibernate(void)
 {
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
     // Debugging: Start hibernation.
     P1DIR |= BIT7;
     P1OUT |= BIT7;
@@ -184,7 +185,7 @@ void Hibernate(void)
     Save_Register();
     *CC_Check = 1;
 
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
     // Debugging: Hibernate finished.
     P1OUT &= ~BIT7;
 #endif // HIB_DEBUG
@@ -227,11 +228,11 @@ void Restore(void)
 
     *current_SP = *FRAM_pc;
 
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
     // Debugging: Restore finished.
     P1OUT &= ~BIT3;
 #endif
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
     // Setting the comparator with the Hibernate threshold
     unsigned int hibernate_3 = (unsigned int)(VMINN);//for debug
     Set_V(hibernate_3);
@@ -247,7 +248,7 @@ void Restore(void)
     *CC_Check = 0;
     pro = 1;
 
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
     P2DIR |= BIT6;
     P2OUT |= BIT6;
 #endif // HIB_DEBUG
@@ -328,7 +329,7 @@ void Restore_Register(void)
     CSCTL0_H = 0x01;
 }
 
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
 void Set_V(unsigned int v)
 {
     counter_check = 0;
@@ -391,7 +392,7 @@ __interrupt void PORT1_ISR(void)
             Hibernate();
 
             if (pro == 0) {
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
                 Set_V(VMIN + 200);
                 __delay_cycles(500);
 #endif // USE_SWITCHES
@@ -399,36 +400,37 @@ __interrupt void PORT1_ISR(void)
                 if (t == 0) {
                     *FLAG_interrupt = 4;
                     int_rising();
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
                     //For Debugging: LPM
                     P1DIR |= BIT1;
                     P1OUT |= BIT1;
 #endif // HIB_DEBUG
                     // Enter sleep state.
-#ifdef USE_LPM5
+#if defined(USE_LPM5)
                     enter_lpm5();
-#elif USE_SHDN
+#elif defined(USE_SHDN)
                     power_off();
+                    __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
 #else
                     __bis_SR_register(LPM4_bits + GIE);
 #endif // USE_LPM5
                     __no_operation();
                 } else {
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
                     unsigned int value_7 = VMINN;
                     Set_V(value_7);
                     __delay_cycles(1000);
 #endif // USE_SWITCHES
                     *FLAG_interrupt = 2;
                     int_falling();
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
                     P2DIR |= BIT6;
                     P2OUT |= BIT6;
 #endif // HIB_DEBUG
                     // Return to active mode with interrupts enabled.
                     __bis_SR_register(GIE);
                     __no_operation();
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
                     P2DIR |= BIT6;
                     P2OUT |= BIT6;
 #endif // HIB_DEBUG
@@ -437,17 +439,17 @@ __interrupt void PORT1_ISR(void)
         }
 
         if (*FLAG_interrupt == 4) {
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
             P1OUT &= ~BIT1;
 #endif // HIB_DEBUG
-#ifdef USE_SWITCHES
+#if defined(USE_SWITCHES)
             unsigned int value_7 = VMINN;
             Set_V(value_7);
             __delay_cycles(1000);
 #endif // USE_SWITCHES
             *FLAG_interrupt = 2;
             int_falling();
-#ifdef HIB_DEBUG
+#if defined(HIB_DEBUG)
             P2DIR |= BIT6;
             P2OUT |= BIT6;
 #endif // HIB_DEBUG

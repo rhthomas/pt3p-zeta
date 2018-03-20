@@ -8,56 +8,51 @@
 #include "util.h"
 #include "hibernation.h"
 
-#define EXT_ON (P1IN & EXT_COMP)
+/* Code to execute when gated by UB20.
+ */
+void node_inactive(void)
+{
+    uint8_t i = 5;
+    for (; i > 0; i--) {
+        led_set(0xAA);
+        __delay_cycles(12e6);
+        led_set(~0xAA);
+        __delay_cycles(12e6);
+    }
 
-uint8_t n = 0;
+    // Shutdown node.
+    power_off();
+}
 
 /* Code to execute when gated by comparator.
  */
 void node_active(void)
 {
+    // This will trigger hibernus ISR.
+    __bis_SR_register(GIE);
+    Hibernus();
     // Count up some LEDs as demonstration.
+    uint8_t n;
     while (1) {
         led_set(n++);
         __delay_cycles(24e5);
     }
 }
 
-/* Code to execute when gated by UB20.
- */
-void node_inactive(void)
-{
-    uint8_t i;
-    for (i = 0; i < 5; i++) {
-        led_set(0xAA);
-        __delay_cycles(12e6);
-        led_set(0x55);
-        __delay_cycles(12e6);
-    }
-    // Shutdown node.
-    power_off();
-}
-
 void main(void)
 {
     // Stop watchdog timer.
     WDTCTL = WDTPW | WDTHOLD;
-    // Unlock the system.
-    PM5CTL0 &= ~LOCKLPM5;
 
     // System initialisations.
     io_init();
     clock_init();
 
-    if (EXT_ON) {
-        __enable_interrupts(); // This will trigger hibernus ISR (hopefully!).
-        Hibernus();
-        node_active();
-    } else {
+    // 1ms delay to wait for comparator output to be set.
+    __delay_cycles(24e3);
+    if (!EXT_ON) {
         node_inactive();
     }
 
-    // Should never get here!
-    while (1)
-        ;
+    node_active();
 }

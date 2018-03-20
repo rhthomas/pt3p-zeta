@@ -1,6 +1,6 @@
 #include "spi.h"
 
-void spi_init(uint8_t fast)
+void spi_init(void)
 {
     P1DIR |= (MOSI + CS);
     P1DIR &= ~MISO;

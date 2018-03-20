@@ -67,12 +67,16 @@ void zeta_select_mode(uint8_t mode)
         // Invalid arguments.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('M');
     zeta_write_byte(mode);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     __delay_cycles(4.8e5); // delay 20ms
 }
@@ -83,20 +87,26 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength)
         // Invalid arguments.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('R');
     zeta_write_byte(ch);
     zeta_write_byte(pLength);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
 //    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
 {
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('A');
@@ -109,7 +119,9 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
     zeta_write_byte(sync2);
     zeta_write_byte(sync3);
     zeta_write_byte(sync4);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     __delay_cycles(4.8e5); // delay 20ms
 }
@@ -120,12 +132,16 @@ void zeta_set_baud_host(uint8_t baud)
         // Invalid argument.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('H');
     zeta_write_byte(baud);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     __delay_cycles(4.8e5); // delay 20ms
 }
@@ -136,12 +152,16 @@ void zeta_set_baud_rf(uint8_t baud)
         // Invalid argument.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('B');
     zeta_write_byte(baud);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     // device must enter sleep and wake again w/ delay of >= 15ms
     P3OUT |= SDN; // digitalWrite(SDN, HIGH);
@@ -157,12 +177,16 @@ void zeta_set_rf_power(uint8_t pwr)
         // Invalid arguments.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('P');
     zeta_write_byte(pwr);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     __delay_cycles(4.8e5); // delay 20ms
 }
@@ -173,23 +197,31 @@ void zeta_enable_crc(uint8_t en)
         // Invalid arguments.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('E');
     zeta_write_byte(en);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_reset_default(void)
 {
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('D');
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     __delay_cycles(4.8e5); // delay 20ms
 }
@@ -200,11 +232,15 @@ void zeta_reset_default(void)
 
 uint8_t zeta_get_rssi(void)
 {
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('Q');
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     zeta_read_byte(); // 'Q'
     zeta_read_byte(); // '#'
@@ -214,11 +250,15 @@ uint8_t zeta_get_rssi(void)
 
 void zeta_get_vers(void)
 {
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('V');
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     // Get version from radio '#V4.00'
     uint8_t cnt = 6 + 1;
@@ -229,11 +269,15 @@ void zeta_get_vers(void)
 
 void zeta_get_settings(uint8_t settings[])
 {
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A');
     zeta_write_byte('T');
     zeta_write_byte('?');
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     // Get settings from radio '#?[8bytes]'
     uint8_t cnt;
@@ -252,7 +296,9 @@ void zeta_send_open(uint8_t ch, uint8_t pLength)
         // Invalid arguments.
         return;
     }
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     zeta_write_byte('A'); // A
     zeta_write_byte('T'); // T
     zeta_write_byte('S'); // S
@@ -271,7 +317,9 @@ void zeta_send_close(void)
 {
     // cycles = MCLK * delay(s)
     __delay_cycles(4.8e5); // delay(20);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 }
 
 void zeta_send_packet(uint8_t packet[], uint8_t len)
@@ -291,9 +339,13 @@ void zeta_send_packet(uint8_t packet[], uint8_t len)
 uint8_t zeta_read_byte(void)
 {
     zeta_wait_irq();
+#ifdef MANUAL
     spi_cs_low();
+#endif // MANUAL
     uint8_t out = spi_xfer(0x00);
+#ifdef MANUAL
     spi_cs_high();
+#endif // MANUAL
 
     return out;
 }
