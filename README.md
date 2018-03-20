@@ -53,24 +53,33 @@ the required registers on the Si4455 radio, from Silicon Labs.
 
 ### Directory Structure
 
+* `hibernus/` - Contains hibernus library from D. Balsamo et al.
 * `lib/` - Contains the library files of the implementation.
-    * `setup` - Used to setup peripherals such as clocks/timers/pins etc.
-      for the MSP430FR5793.
     * `spi` - Contains the SPI initialisation and transfer functions.
     * `uart` - Contains the UART initialisation and print functions for
       debugging.
+    * `util` - Used to setup peripherals such as clocks/timers/pins etc.
+        for the MSP430FR5793.
     * `zeta` - This holds the main library functions for interfacing with the
     radio module.
+* `test/` - Main files to test each module.
+    * `test-hib.c` - Test hibernus modifications work.
+    * `test-radio-rx.c` - Test receiving packets from radio module.
+    * `test-radio-tx.c` - Test transmitting packets from radio module.
+    * `test-radio.c` - Unified radio test suite. Just different `define` for Tx'er or Rx'er.
+    * `test-sdn-hib.c` - Incorporate hibernus into the shutdown test case. This
+        shows two modes of operation; active, which counts up the LEDs, and
+        inactive, where the processor flashes the LEDs and then removes power.
+        This is the backbone of the main proposed operation.
+    * `test-sdn.c` - Test the simple case where the same code is run, but
+        release the latch of the power-supply.
 * `LICENSE` - Here is the copyright licenses of any other software that is used
   in this project (although it may not be included in the repo).
 * `README.md` - This file.
 * `main.c` - Combined main file which will demonstrate the proposed solution to
   the project. This will receive few updates until all other modules have been
   tested and work as expected.
-* `test-radio-rx.c` - Test receiving packets from radio module. **Currently
-  work in progress.**
-* `test-radio-tx.c` - Test transmitting packets from radio module. **Currently
-  work in progress.**
+* `pinout.png` - Pinout diagram for connecting peripherals to the MSP board.
 
 ## Documentation
 
@@ -84,15 +93,18 @@ compiled Doxygen is available [here](https://rhthomas.github.io/docs/zeta).
 	- [x] SPI
 	- [x] ZETAPLUS
 - [x] Configure radio with libraries (i.e. set RF baud and sync bytes).
-- [ ] Get transmission working.
+- [x] Get transmission working.
 - [ ] Receive packet over RF.
 - [ ] Wake-up node over RF with UB20.
+    - [x] Investigate relationship between rectenna output voltage and range.
 - [ ] Write unified `main.c` program.
-	- [ ] Incorporate Hibernus.
+	- [x] Test Hibernus.
     	- [x] Test comparator.
     	- [x] Test Hibernus in isolation.
 		- [x] Remove clashes with clock/pin initialisation *(change as per the
               above pinout diagram)*.
-        - [ ] Sleep hibernus test in LPM4.5.
-	- [ ] Incorporate RESTOP.
-- [ ] Optimise code *(more ISRs and use DMA)*.
+        - [x] Sleep hibernus test in LPM4.5.
+    - [x] Test shutdown hardware.
+    - [x] Incorporate hibernus into shutdown hardware.
+    - [x] Test `main.c` without radio modules (Hardware triggers i.e. buttons).
+    - [ ] Test `main.c` with radio hardware included.
