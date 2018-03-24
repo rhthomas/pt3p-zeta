@@ -90,7 +90,7 @@ void zeta_init(void);
  *
  * @test Check these are correct.
  */
-void zeta_wait_irq(void);
+error_t zeta_wait_irq(void);
 
 /**
  * @brief Wait until device is ready for another command.
@@ -303,7 +303,25 @@ uint8_t zeta_read_byte(void);
  * @test Confirm that this works as expected.
  * @note Call zeta_wait_irq() after each Rx'd packet.
  */
-void zeta_rx_packet(uint8_t* packet);
+// void zeta_rx_packet(uint8_t* packet);
+
+/**
+ * @brief Receive packet from radio module.
+ *
+ * This function writes the packet directly to the head of the mailbox FIFO
+ * buffer that is in FRAM.
+ *
+ * * '#' - Shows the start of a new packet.
+ * * 'R' - Shows the start of a new packet.
+ * * Length - Length of received packet.
+ * * RSSI - Received signal strength indicator.
+ * * Packet - The received packet.
+ *
+ * @retval ERROR_OK - No errors.
+ * @retval ERROR_NOBUFS - Buffer is full.
+ * @retval ERROR_TIMEOUT - Receive timeout, perhaps false wake-up.
+ */
+error_t zeta_rx_packet(void);
 
 /** @} */
 

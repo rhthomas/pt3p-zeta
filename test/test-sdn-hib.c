@@ -15,13 +15,15 @@ void node_inactive(void)
     uint8_t i = 5;
     for (; i > 0; i--) {
         led_set(0xAA);
-        __delay_cycles(12e6);
+        __delay_cycles(6e6);
         led_set(~0xAA);
-        __delay_cycles(12e6);
+        __delay_cycles(6e6);
     }
-
-    // Shutdown node.
-    power_off();
+    // Check the supply hasn't come up meanwhile.
+    if (!COMP_ON) {
+        // Shutdown node.
+        power_off();
+    }
 }
 
 /* Code to execute when gated by comparator.
@@ -50,7 +52,7 @@ void main(void)
 
     // 1ms delay to wait for comparator output to be set.
     __delay_cycles(24e3);
-    if (!EXT_ON) {
+    if (!COMP_ON) {
         node_inactive();
     }
 

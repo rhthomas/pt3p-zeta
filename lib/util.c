@@ -1,26 +1,5 @@
 #include <util.h>
 
-//void io_init(void)
-//{
-//    // All ports output.
-//    PADIR = 0xFFFF;
-//    PBDIR = 0xFFFF;
-//    PJDIR = 0xFFFF;
-//    // All outputs low.
-//    PAOUT = 0;
-//    PBOUT = 0;
-//    PJOUT = 0;
-//    /* Set external comparator on P1.0 as input (no pull-up) with interrupts
-//     * enabled.
-//     */
-//    P1DIR &= ~EXT_COMP; // Set P1.0 as an input.
-//    P1REN &= ~EXT_COMP; // Disable pull resistors.
-//    P1IE |= EXT_COMP;
-//    // Set power-supply latch as output, and immediately drive high.
-//    // P4DIR |= PS_LATCH;
-//    P4OUT |= PS_LATCH;
-//}
-
 void io_init(void)
 {
     // PORT 1
@@ -31,7 +10,6 @@ void io_init(void)
     // PORT 4
     P4DIR = 0xFF;
     P4OUT &= ~PS_LATCH;
-//    P4OUT = PS_LATCH;
     // PORT 2
     P2DIR = 0xFF;
     P2OUT = 0;
@@ -62,20 +40,23 @@ void clock_init(void)
 void timer_init(void)
 {
     // ACLK, upmode, clear.
-    TA0CTL |= (TASSEL__ACLK | MC_1);
+    TA0CTL |= TASSEL__ACLK;
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-    TA0CCR0 = 0x2711; // ~1s delay.
+//    TA0CCR0 = 0x2711; // ~1s delay.
+    TA0CCR0 = 0x1389; // ~2s delay.
 }
 
 inline void timer_start(void)
 {
-    TA0CTL |= MC_1;
+    __bis_SR_register(GIE); // Enable interrupts for timeout.
+    TA0CTL |= MC_1;         // Start counting.
 }
 
 inline void timer_stop(void)
 {
-    TA0CTL &= ~MC_1;
-    timer_reset();
+    TA0CTL &= ~MC_1; // Stop counting.
+    timer_reset();   // Reset counter to 0.
+    __bic_SR_register(GIE);
 }
 
 inline void timer_reset(void)
@@ -111,10 +92,6 @@ inline void enter_lpm5(void)
 
 inline void power_off(void)
 {
-//    P4DIR &= ~PS_LATCH;
-//    P4REN |= PS_LATCH;
-
-//    P4OUT &= ~PS_LATCH;
-    // Active-low shut off when driving a PNP.
+    // Active-low shut off when driving a PMOS.
     P4OUT |= PS_LATCH;
 }

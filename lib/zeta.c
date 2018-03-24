@@ -1,5 +1,7 @@
 #include "zeta.h"
 
+extern volatile uint8_t exit_loop;
+
 uint8_t reverse(uint8_t byte)
 {
     byte = (byte & 0xF0) >> 4 | (byte & 0x0F) << 4;
@@ -22,9 +24,10 @@ void zeta_init(void)
 
     spi_cs_high();
     // digitalWrite(SDN, LOW);
-    P3OUT &= ~SDN; // hold device in wake state
+    P1OUT &= ~SDN; // hold device in wake state
 
     // Wait for CODEC to be ready for commands.
+    __delay_cycles(4.8e5);
     zeta_ready();
 
     /* Configure device:
@@ -39,11 +42,15 @@ void zeta_init(void)
     zeta_set_baud_rf(6u);
 }
 
-void zeta_wait_irq(void)
+error_t zeta_wait_irq(void)
 {
     // Wait for nIRQ to go low.
-    while (P1IN & IRQ)
-        ;
+    while (P1IN & IRQ) {
+        if (exit_loop) {
+            return ERROR_TIMEOUT;
+        }
+    }
+    return ERROR_OK;
 }
 
 void zeta_ready(void)
@@ -78,7 +85,7 @@ void zeta_select_mode(uint8_t mode)
     spi_cs_high();
 #endif // MANUAL
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_rx_mode(uint8_t ch, uint8_t pLength)
@@ -123,7 +130,7 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
     spi_cs_high();
 #endif // MANUAL
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_baud_host(uint8_t baud)
@@ -143,7 +150,7 @@ void zeta_set_baud_host(uint8_t baud)
     spi_cs_high();
 #endif // MANUAL
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_baud_rf(uint8_t baud)
@@ -164,11 +171,11 @@ void zeta_set_baud_rf(uint8_t baud)
 #endif // MANUAL
 
     // device must enter sleep and wake again w/ delay of >= 15ms
-    P3OUT |= SDN; // digitalWrite(SDN, HIGH);
+    P1OUT |= SDN; // digitalWrite(SDN, HIGH);
     __delay_cycles(4.8e5); // delay(20);
-    P3OUT &= ~SDN; // digitalWrite(SDN, LOW);
+    P1OUT &= ~SDN; // digitalWrite(SDN, LOW);
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_rf_power(uint8_t pwr)
@@ -188,7 +195,7 @@ void zeta_set_rf_power(uint8_t pwr)
     spi_cs_high();
 #endif // MANUAL
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_enable_crc(uint8_t en)
@@ -208,7 +215,7 @@ void zeta_enable_crc(uint8_t en)
     spi_cs_high();
 #endif // MANUAL
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_reset_default(void)
@@ -223,7 +230,7 @@ void zeta_reset_default(void)
     spi_cs_high();
 #endif // MANUAL
 
-    __delay_cycles(4.8e5); // delay 20ms
+//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 //--------------------------------------
@@ -338,7 +345,9 @@ void zeta_send_packet(uint8_t packet[], uint8_t len)
 
 uint8_t zeta_read_byte(void)
 {
-    zeta_wait_irq();
+    if (zeta_wait_irq()) {
+        return ERROR_TIMEOUT;
+    }
 #ifdef MANUAL
     spi_cs_low();
 #endif // MANUAL
@@ -350,11 +359,30 @@ uint8_t zeta_read_byte(void)
     return out;
 }
 
-void zeta_rx_packet(uint8_t packet[])
+// void zeta_rx_packet(uint8_t packet[])
+// {
+//     uint8_t i = 0, len = 0;
+//     // Get whole packet from FIFO.
+//     packet[i++] = zeta_read_byte(); // '#'
+//     packet[i++] = zeta_read_byte(); // 'R'
+//     packet[i++] = len = zeta_read_byte(); // Length of packet.
+//     packet[i++] = zeta_read_byte(); // RSSI
+//     // The actual packet contents.
+//     for (; len > 0; len--) {
+//         packet[i++] = zeta_read_byte();
+//     }
+//     // Clear exit_loop flag.
+//     exit_loop = 0;
+// }
+
+error_t zeta_rx_packet(void)
 {
-    uint8_t i = 0, len = 0;
-    // Wait for nIRQ to show there is data.
-//    zeta_wait_irq();
+    uint8_t i = 0, len = 0, err = 0;
+    if (zeta_wait_irq()) {
+        // Clear exit_loop flag.
+        exit_loop = 0;
+        return ERROR_TIMEOUT;
+    }
     // Get whole packet from FIFO.
     packet[i++] = zeta_read_byte(); // '#'
     packet[i++] = zeta_read_byte(); // 'R'
@@ -364,4 +392,8 @@ void zeta_rx_packet(uint8_t packet[])
     for (; len > 0; len--) {
         packet[i++] = zeta_read_byte();
     }
+    // Clear exit_loop flag.
+    exit_loop = 0;
+    // Return no errors.
+    return ERROR_OK;
 }

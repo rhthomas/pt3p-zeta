@@ -15,88 +15,71 @@
 #include "util.h" // System setup functions
 #include "uart.h" // Debugging
 #include "zeta.h" // Radio
-#include "hibernation.h" // Hibernuss
+#include "hibernation.h" // Hibernus
 
-uint8_t count = 0;
-uint8_t in_packet[5u + 4u]; ///< Array for received data.
+volatile uint8_t exit_loop = 0;
 
-#define EXT_ON (P1IN & EXT_COMP)
-
-/* Code to execute when Vc > Vactive.
- */
-void node_active(void)
-{
-    // Count up some LEDs as demonstration.
-    while (1) {
-        led_set(n++);
-        __delay_cycles(24e5);
-    }
-}
-
-/* Code to execute when Vmin <= Vc <= Vactive.
- *
- * Receive packet and store it into NVM.
+/* Code to execute when gated by UB20.
  */
 void node_inactive(void)
 {
-    // Set Rx mode.
-    zeta_select_mode(1);
-    // Operating on channel 0 with packet size of 9 bytes.
-    zeta_rx_mode(CHANNEL, (5u + 4u));
-    // Start timeout timer.
-    timer_start();
-    // Get incoming packet.
-    zeta_rx_packet(in_packet);
-    // Start timeout timer.
-    timer_stop();
-    // Write to NVM.
-    /// @todo Write received packet to NVM.
-    // Shutdown node.
-    power_off();
+    zeta_select_mode(1); // Set Rx mode.
+    // Operating on channel 15 with packet size of 64 bytes.
+    zeta_rx_mode(CHANNEL, 64u);
+    timer_start();       // Start timeout timer.
+    zeta_rx_packet();    // Get incoming packet and write to mailbox FIFO.
+    timer_stop();        // Stop timeout timer.
+    // Check the supply hasn't come up meanwhile.
+    if (!COMP_ON) {
+        power_off();     // Shutdown node.
+    }
 }
+
+/* Code to execute when gated by comparator.
+ */
+ void node_active(void)
+ {
+     // This will trigger hibernus ISR.
+    __bis_SR_register(GIE);
+     Hibernus();
+     // Count up some LEDs as demonstration.
+     uint8_t n;
+     while (1) {
+         led_set(n++);
+         __delay_cycles(24e5);
+     }
+ }
 
 void main(void)
 {
     // Stop watchdog timer.
     WDTCTL = WDTPW | WDTHOLD;
-    PM5CTL0 &= ~LOCKLPM5;
 
     // System setup.
     io_init();
     clock_init();
+    timer_init();
     spi_init();
     zeta_init();
 
-    // Check what is gating the power-supply.
-    if (EXT_ON) {
-        uart_init();
-        // Test whether system needs a restore.
-        Hibernus();
-        node_active();
-    } else {
+    // 1ms delay to wait for comparator output to be set.
+    /// @note Probably won't be necessary since radio setup takes a while.
+    __delay_cycles(24e3);
+    if (!COMP_ON) {
         node_inactive();
     }
 
-    // Should never get here!
-    while (1)
-        ;
+    node_active();
 }
 
 /* Timeout counter.
  *
- * While the node is trying zeta_rx_packet(), if it isn't handled within 2s then
+ * While the node is trying zeta_rx_packet(), if it isn't handled within 1s then
  * we assume false wake-up and return to sleep.
  */
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void TIMER0_A0_ISR(void)
 {
-    // Timer triggers every second, add delay.
-    if (count++ == 2) {
-        // Reset counter for next time.
-        count = 0;
-        // Stop timer.
-        timer_stop();
-        // Cut power to the node.
-        power_off();
-    }
+    timer_stop(); // Stop timer.
+    exit_loop = 1;
 }

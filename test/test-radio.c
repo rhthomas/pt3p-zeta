@@ -33,6 +33,7 @@ void main(void)
     // Setup peripherals.
     io_init();
     clock_init();
+    timer_init();
     spi_init();
     zeta_init();
 
@@ -40,7 +41,8 @@ void main(void)
 //    zeta_select_mode(0x2);
 #else
     zeta_select_mode(0x1);
-//    zeta_rx_mode(CHANNEL, 64u);
+    zeta_rx_mode(CHANNEL, 64u);
+    P1OUT |= BIT2;
 #endif // TXER
 
     // Main loop.

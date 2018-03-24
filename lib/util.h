@@ -32,7 +32,31 @@
 #define EXT_COMP (BIT0) ///< External comparator output connects to P1.0.
 
 // State definitions.
-#define EXT_ON (P1IN & EXT_COMP) ///< Tests the state of the comparator output.
+#define COMP_ON (P1IN & EXT_COMP) ///< Tests the state of the comparator output.
+
+typedef enum {
+    ERROR_OK,
+    ERROR_NOBUFS,
+    ERROR_TIMEOUT
+} error_t;
+
+// Packet types are just 64 byte arrays.
+typedef struct {
+    uint8_t arr[64];
+} packet_t;
+
+/// @todo Write simple buffer for mailbox in FRAM.
+#if 0
+#pragma SET_DATA_SECTION(".mailbox")
+
+// Mailbox is 64 solts of 64 byte packets (4kB).
+packet_t mailbox[64];
+
+uint16_t *mb_start = (uint16_t *)
+uint16_t *mb_end   = (uint16_t *)
+
+#pragma SET_DATA_SECTION()
+#endif
 
 /**
  * @defgroup init Initialisation

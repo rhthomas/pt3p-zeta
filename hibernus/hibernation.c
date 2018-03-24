@@ -85,7 +85,9 @@ void Hibernus(void)
 
     // Restore procedure
     // Waiting until the system reaches the restore threshold
-    t = (P1IN & BIT0); // t = 0;
+//    t = (P1IN & BIT0); // t = 0;
+//    t = !COMP_OFF;
+    t = COMP_ON;
     if (t == 0) {
         *FLAG_interrupt = 1;
         int_rising();
@@ -396,7 +398,9 @@ __interrupt void PORT1_ISR(void)
                 Set_V(VMIN + 200);
                 __delay_cycles(500);
 #endif // USE_SWITCHES
-                t = (P1IN & BIT0); // t = 1;
+//                t = (P1IN & BIT0); // t = 1;
+//                t = !COMP_OFF; // t = 1;
+                t = COMP_ON;
                 if (t == 0) {
                     *FLAG_interrupt = 4;
                     int_rising();
