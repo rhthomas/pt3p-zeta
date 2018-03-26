@@ -87,24 +87,17 @@ void zeta_init(void);
 
 /**
  * @brief Wait for interrupt from CODEC (data ready).
- *
- * @test Check these are correct.
  */
 error_t zeta_wait_irq(void);
 
 /**
  * @brief Wait until device is ready for another command.
- *
- * @test Check these are correct.
  */
 void zeta_ready(void);
 
 /**
  * @defgroup config Radio Configuration
  * @brief Functions to configure the radio settings (i.e. channel, mode etc).
- * @note All configuration functions end with a 20ms delay.
- * @test What's the shortest delay we can have?
- * @test Is the delay required?
  * @{
  */
 
@@ -303,7 +296,7 @@ uint8_t zeta_read_byte(void);
  * @test Confirm that this works as expected.
  * @note Call zeta_wait_irq() after each Rx'd packet.
  */
-// void zeta_rx_packet(uint8_t* packet);
+void zeta_rx_packet(uint8_t* packet);
 
 /**
  * @brief Receive packet from radio module.
@@ -321,7 +314,7 @@ uint8_t zeta_read_byte(void);
  * @retval ERROR_NOBUFS - Buffer is full.
  * @retval ERROR_TIMEOUT - Receive timeout, perhaps false wake-up.
  */
-error_t zeta_rx_packet(void);
+//error_t zeta_rx_packet(void);
 
 /** @} */
 

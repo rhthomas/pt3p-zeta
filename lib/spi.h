@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <msp430.h>
 
-#define MANUAL ///< Uncomment for manual CS toggling.
+#define MANUAL ///< Uncomment for automatic CS toggling.
 
 #define CS   (BIT3) ///< Chip select pin for SPI (P1.3).
 #define SCLK (BIT2) ///< SPI clock (P2.2).

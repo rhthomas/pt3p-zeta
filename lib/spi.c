@@ -6,6 +6,9 @@ void spi_init(void)
     P1DIR &= ~MISO;
     P2DIR |= SCLK;
 
+    P1REN |= MISO; // enable pull resistor
+    P1OUT |= MISO; // pull up
+
     // Secondary functionality of pins.
     P2SEL1 |= SCLK;
     P1SEL1 |= (MOSI | MISO);
@@ -27,7 +30,6 @@ void spi_init(void)
      * x. Active low. (not used, now manual)
      * 5. SMCLK as source. */
     UCB0CTLW0 |= (UCMST | UCSYNC | UCMSB | UCCKPH);
-    // TODO You've commented this out without testing.
 #ifndef MANUAL
     UCB0CTLW0 |= (UCMODE1 | UCSTEM);
 #endif // MANUAL

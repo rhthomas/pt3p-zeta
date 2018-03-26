@@ -1,5 +1,7 @@
 #include <util.h>
 
+extern volatile uint8_t exit_loop;
+
 void io_init(void)
 {
     // PORT 1
