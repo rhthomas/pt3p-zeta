@@ -231,7 +231,7 @@ void zeta_get_vers(void);
  * @note To see output, attach Saleae.
  * @ingroup debug
  */
-void zeta_get_settings(uint8_t settings[]);
+void zeta_get_settings(uint8_t *settings);
 
 /**
  * @defgroup tx Transmission
@@ -279,7 +279,10 @@ void zeta_send_packet(uint8_t *packet, uint8_t len);
 /**
  * @brief Read one byte from FIFO only.
  *
- * @return Byte from the FIFO buffer.
+ * @param out - Address to write read byte to.
+ * @return Any errors during read.
+ * @retval ERROR_OK - No errors.
+ * @retval ERROR_TIMEOUT - Receive timeout, perhaps false wake-up.
  */
 error_t zeta_read_byte(uint8_t *out);
 
@@ -290,31 +293,13 @@ error_t zeta_read_byte(uint8_t *out);
  * * 'R' - Shows the start of a new packet.
  * * Length - Length of received packet.
  * * RSSI - Received signal strength indicator.
- * * Packet - The received packet.
+ * * Packet[Length] - The received packet.
  *
  * @param[out] packet : Array to return Rx'd packet to.
- * @test Confirm that this works as expected.
- * @note Call zeta_wait_irq() after each Rx'd packet.
- */
-void zeta_rx_packet(uint8_t *packet);
-
-/**
- * @brief Receive packet from radio module.
- *
- * This function writes the packet directly to the head of the mailbox FIFO
- * buffer that is in FRAM.
- *
- * * '#' - Shows the start of a new packet.
- * * 'R' - Shows the start of a new packet.
- * * Length - Length of received packet.
- * * RSSI - Received signal strength indicator.
- * * Packet - The received packet.
- *
  * @retval ERROR_OK - No errors.
- * @retval ERROR_NOBUFS - Buffer is full.
  * @retval ERROR_TIMEOUT - Receive timeout, perhaps false wake-up.
  */
-//error_t zeta_rx_packet(void);
+error_t zeta_rx_packet(uint8_t *packet);
 
 /** @} */
 

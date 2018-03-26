@@ -84,8 +84,6 @@ void zeta_select_mode(uint8_t mode)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_rx_mode(uint8_t ch, uint8_t pLength)
@@ -105,8 +103,6 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
@@ -129,8 +125,6 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_baud_host(uint8_t baud)
@@ -149,8 +143,6 @@ void zeta_set_baud_host(uint8_t baud)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_baud_rf(uint8_t baud)
@@ -174,8 +166,6 @@ void zeta_set_baud_rf(uint8_t baud)
     P1OUT |= SDN; // digitalWrite(SDN, HIGH);
     __delay_cycles(4.8e5); // delay(20);
     P1OUT &= ~SDN; // digitalWrite(SDN, LOW);
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_set_rf_power(uint8_t pwr)
@@ -194,8 +184,6 @@ void zeta_set_rf_power(uint8_t pwr)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_enable_crc(uint8_t en)
@@ -214,8 +202,6 @@ void zeta_enable_crc(uint8_t en)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 void zeta_reset_default(void)
@@ -229,8 +215,6 @@ void zeta_reset_default(void)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-
-//    __delay_cycles(4.8e5); // delay 20ms
 }
 
 //--------------------------------------
@@ -357,7 +341,7 @@ error_t zeta_read_byte(uint8_t *out)
     if (zeta_wait_irq()) {
         return ERROR_TIMEOUT;
     }
-    exit_loop = 0;
+
 #ifdef MANUAL
     spi_cs_low();
 #endif // MANUAL
@@ -365,61 +349,31 @@ error_t zeta_read_byte(uint8_t *out)
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
+
     return ERROR_OK;
 }
 
-void zeta_rx_packet(uint8_t *packet)
+error_t zeta_rx_packet(uint8_t *packet)
 {
-    uint8_t i = 0, len = 0, out = 0;
-    // Get whole packet from FIFO.
+    uint8_t i = 0, len = 0;
 
-    //    packet[i++] = zeta_read_byte(); // '#'
-    if (!zeta_read_byte(&out)) {
-        packet[i++] = out;
-    }
-    //    packet[i++] = zeta_read_byte(); // 'R'
-    if (!zeta_read_byte(&out)) {
-        packet[i++] = out;
-    }
-    //    packet[i++] = zeta_read_byte(); // length
-    if (!zeta_read_byte(&out)) {
-        packet[i++] = len = out;
-    }
-    //    packet[i++] = zeta_read_byte(); // RSSI
-    if (!zeta_read_byte(&out)) {
-        packet[i++] = out;
+    // # R <len> <rssi>
+    for (i = 0; i < 4; i++) {
+        if (zeta_read_byte(&packet[i])) {
+            return ERROR_TIMEOUT;
+        }
+        if (i == 2) {
+            len = packet[i];
+        }
     }
 
     // The actual packet contents.
     for (; len > 0; len--) {
-//        packet[i++] = zeta_read_byte();
-        if (!zeta_read_byte(&out)) {
-            packet[i++] = out;
+        if (zeta_read_byte(&packet[i++])) {
+            return ERROR_TIMEOUT;
         }
     }
-    // Clear exit_loop flag.
-    exit_loop = 0;
-}
 
-//error_t zeta_rx_packet(void)
-//{
-//    uint8_t i = 0, len = 0, err = 0;
-//    if (zeta_wait_irq()) {
-//        // Clear exit_loop flag.
-//        exit_loop = 0;
-//        return ERROR_TIMEOUT;
-//    }
-//    // Get whole packet from FIFO.
-//    packet[i++] = zeta_read_byte(); // '#'
-//    packet[i++] = zeta_read_byte(); // 'R'
-//    packet[i++] = len = zeta_read_byte(); // Length of packet.
-//    packet[i++] = zeta_read_byte(); // RSSI
-//    // The actual packet contents.
-//    for (; len > 0; len--) {
-//        packet[i++] = zeta_read_byte();
-//    }
-//    // Clear exit_loop flag.
-//    exit_loop = 0;
-//    // Return no errors.
-//    return ERROR_OK;
-//}
+    // Packet successfully received.
+    return ERROR_OK;
+}
