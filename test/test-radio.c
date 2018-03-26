@@ -8,7 +8,7 @@
 #include "util.h" // System setup functions
 #include "zeta.h" // Radio
 
-#define TXER ///< Node is transmitter.
+//#define TXER ///< Node is transmitter.
 
 volatile uint8_t exit_loop = 0;
 
@@ -36,23 +36,18 @@ void main(void)
     zeta_select_mode(0x2);
 #else
     zeta_select_mode(0x1);
-    zeta_rx_mode(CHANNEL, 5u);
 #endif // TXER
 
     // Main loop.
     while (1) {
+//        zeta_get_vers();
+//        zeta_get_settings(settings);
 #ifdef TXER
-        timer_start();
-        zeta_get_vers();
-        timer_stop();
-        // Send packet.
         zeta_send_packet(msg, sizeof(msg));
         __delay_cycles(24e5);
 #else
-        zeta_get_vers();
-//        zeta_get_settings(settings);
-        // Receive packet.
-//        zeta_rx_packet(in_packet);
+        zeta_rx_mode(CHANNEL, 5u);
+        zeta_rx_packet(in_packet);
         __delay_cycles(24e4);
 #endif // TXER
         P3OUT ^= BIT7; // Toggle LED.

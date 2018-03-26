@@ -29,7 +29,7 @@ void zeta_init(void)
     // Wait for CODEC to be ready for commands.
     __delay_cycles(24e6);
     zeta_ready(); // Hangs code when debugging.
-//    zeta_reset_default();
+    zeta_reset_default();
 
     /* Configure device:
      * 1. Max. transmit power.
@@ -45,12 +45,15 @@ void zeta_init(void)
 
 error_t zeta_wait_irq(void)
 {
+    timer_start();
     // Wait for nIRQ to go low.
     while (P1IN & IRQ) {
         if (exit_loop) {
+            timer_stop();
             return ERROR_TIMEOUT;
         }
     }
+    timer_stop();
     return ERROR_OK;
 }
 
@@ -265,9 +268,11 @@ void zeta_get_vers(void)
 
     // Get version from radio '#V4.00'
     uint8_t cnt;
-    for (cnt = 12; cnt > 0; cnt--) {
+    for (cnt = 6; cnt > 0; cnt--) {
         zeta_read_byte();
     }
+
+    exit_loop = 0;
 }
 
 void zeta_get_settings(uint8_t settings[])
@@ -287,6 +292,8 @@ void zeta_get_settings(uint8_t settings[])
     for (byte = 0; byte < 10; byte++) {
         settings[byte] = zeta_read_byte();
     }
+
+    exit_loop = 0;
 }
 
 //--------------------------------------
@@ -344,6 +351,7 @@ uint8_t zeta_read_byte(void)
     if (zeta_wait_irq()) {
         return ERROR_TIMEOUT;
     }
+    exit_loop = 0;
 #ifdef MANUAL
     spi_cs_low();
 #endif // MANUAL
