@@ -8,30 +8,17 @@
 #include "util.h" // System setup functions
 #include "zeta.h" // Radio
 
-//#define TXER ///< Node is transmitter.
-
 volatile uint8_t exit_loop = 0;
+
+//#define TXER ///< Node is transmitter.
 
 #ifdef TXER
 //uint8_t msg[16u] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-uint8_t msg[1] = {0};
+uint8_t msg[1] = {0}; // For count example.
 #else
 //uint8_t in_packet[16u + 4u]; ///< Array for received data.
-uint8_t in_packet[1u + 4u] = {0, 0, 0, 0, 0};
+uint8_t in_packet[1u + 4u] = {0, 0, 0, 0, 0}; // For count example.
 #endif
-
-/* Flash the LEDs to indicate a timeout.
- */
-void flash(void)
-{
-    uint8_t i;
-    for (i = 0; i < 5; i++) {
-        led_set(0xFF);
-        __delay_cycles(4.8e5);
-        led_clear();
-        __delay_cycles(4.8e5);
-    }
-}
 
 void main(void)
 {
@@ -46,9 +33,9 @@ void main(void)
     zeta_init();
 
 #ifdef TXER
-    zeta_select_mode(0x2);
+    zeta_select_mode(2); // Put radio in ready mode.
 #else
-    zeta_select_mode(0x1);
+    zeta_select_mode(1); // Put radio in receive mode.
 #endif // TXER
 
     while (1) {
@@ -61,22 +48,12 @@ void main(void)
         zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
         if (zeta_rx_packet(in_packet)) {
             exit_loop = 0;
-        } else {
+        } /*else {
             led_set(in_packet[4]);
-        }
+        } */
+        // Display last valid reception on the LEDs.
+        led_set(in_packet[4]);
         __delay_cycles(24e5);
 #endif // TXER
     }
-}
-
-/* Timeout protection.
- *
- * @todo Put this somewhere more suitable (i.e. inside the zeta library).
- */
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void TIMER0_A0_ISR(void)
-{
-    timer_stop(); // Stop timer.
-    flash();
-    exit_loop = 1;
 }

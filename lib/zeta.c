@@ -15,7 +15,6 @@ void zeta_init(void)
     // spi_init() will be called from main BEFORE zeta_init()
 
     P1DIR |= SDN;  // Set SDN pin as output.
-
     P1DIR &= ~IRQ; // Set nIRQ as input.
     P1REN |= IRQ;  // Enable pull resistor.
     P1OUT |= IRQ;  // Pull up.
@@ -27,8 +26,8 @@ void zeta_init(void)
     P1OUT &= ~SDN; // hold device in wake state
 
     // Wait for CODEC to be ready for commands.
-    __delay_cycles(24e6);
-    zeta_ready(); // Hangs code when debugging.
+    // __delay_cycles(24e6);
+    zeta_ready();
     zeta_reset_default();
 
     /* Configure device:
@@ -163,9 +162,9 @@ void zeta_set_baud_rf(uint8_t baud)
 #endif // MANUAL
 
     // device must enter sleep and wake again w/ delay of >= 15ms
-    P1OUT |= SDN; // digitalWrite(SDN, HIGH);
+    P1OUT |= SDN;
     __delay_cycles(4.8e5); // delay(20);
-    P1OUT &= ~SDN; // digitalWrite(SDN, LOW);
+    P1OUT &= ~SDN;
 }
 
 void zeta_set_rf_power(uint8_t pwr)
@@ -235,7 +234,10 @@ uint8_t zeta_get_rssi(void)
 
     uint8_t i, rssi;
     for (i = 3; i > 0; i--) {
-        zeta_read_byte(&rssi);
+        if (zeta_read_byte(&rssi)) {
+            exit_loop = 0;
+            return 0; // Exit if error.
+        }
     }
     return rssi; // RSSI value.
 }
@@ -253,17 +255,17 @@ void zeta_get_vers(void)
 #endif // MANUAL
 
     // Get version from radio '#V4.00'
-    uint8_t cnt, out;
-    for (cnt = 6; cnt > 0; cnt--) {
-        if (!zeta_read_byte(&out)) {
-
+    uint8_t i, vers;
+    for (i = 6; i > 0; i--) {
+        if (zeta_read_byte(&vers)) {
+            exit_loop = 0;
+            return; // Exit if error.
         }
     }
-
     exit_loop = 0;
 }
 
-void zeta_get_settings(uint8_t settings[])
+void zeta_get_settings(uint8_t *settings)
 {
 #ifdef MANUAL
     spi_cs_low();
@@ -276,13 +278,13 @@ void zeta_get_settings(uint8_t settings[])
 #endif // MANUAL
 
     // Get settings from radio '#?[8bytes]'
-    uint8_t byte, out;
+    uint8_t byte;
     for (byte = 0; byte < 10; byte++) {
-        if (!zeta_read_byte(&out)) {
-            settings[byte] = out;
+        if (zeta_read_byte(&settings[byte])) {
+            exit_loop = 0;
+            return; // Exit if error.
         }
     }
-
     exit_loop = 0;
 }
 
@@ -376,4 +378,12 @@ error_t zeta_rx_packet(uint8_t *packet)
 
     // Packet successfully received.
     return ERROR_OK;
+}
+
+#pragma vector=TIMER0_A0_VECTOR
+__interrupt void TIMER0_A0_ISR(void)
+{
+    timer_stop();  // Stop timer.
+    led_flash();   // Flash LEDs to indicate.
+    exit_loop = 1; // Assert exit flag.
 }

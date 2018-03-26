@@ -228,7 +228,7 @@ void zeta_get_vers(void);
  * 7. Sync byte 4.
  * 8. Channel number (0-15).
  *
- * @note To see output, attach Saleae.
+ * @param settings - Address of array to store the read settings.
  * @ingroup debug
  */
 void zeta_get_settings(uint8_t *settings);

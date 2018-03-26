@@ -18,6 +18,7 @@
 #include "hibernation.h" // Hibernus
 
 volatile uint8_t exit_loop = 0;
+uint8_t in_packet[1u + 4u] = {0};
 
 /* Code to execute when gated by UB20.
  */
@@ -25,10 +26,15 @@ void node_inactive(void)
 {
     zeta_select_mode(1); // Set Rx mode.
     // Operating on channel 15 with packet size of 64 bytes.
-    zeta_rx_mode(CHANNEL, 64u);
-    timer_start();       // Start timeout timer.
-    zeta_rx_packet();    // Get incoming packet and write to mailbox FIFO.
-    timer_stop();        // Stop timeout timer.
+    zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
+    if (zeta_rx_packet(in_packet)) { // Get incoming packet and write to mailbox FIFO.
+        exit_loop = 0;
+    } else {
+        // Show received value on LEDs.
+        led_set(in_packet[4]);
+        __delay_cycles(48e6);
+    }
+
     // Check the supply hasn't come up meanwhile.
     if (!COMP_ON) {
         power_off();     // Shutdown node.
@@ -63,23 +69,11 @@ void main(void)
     zeta_init();
 
     // 1ms delay to wait for comparator output to be set.
-    /// @note Probably won't be necessary since radio setup takes a while.
+    /// @test Is this required, with the slow start-up of the radio?
     __delay_cycles(24e3);
     if (!COMP_ON) {
         node_inactive();
     }
 
     node_active();
-}
-
-/* Timeout counter.
- *
- * While the node is trying zeta_rx_packet(), if it isn't handled within 1s then
- * we assume false wake-up and return to sleep.
- */
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void TIMER0_A0_ISR(void)
-{
-    timer_stop(); // Stop timer.
-    exit_loop = 1;
 }

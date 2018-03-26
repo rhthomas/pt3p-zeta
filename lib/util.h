@@ -40,24 +40,6 @@ typedef enum {
     ERROR_TIMEOUT
 } error_t;
 
-// Packet types are just 64 byte arrays.
-typedef struct {
-    uint8_t arr[64];
-} packet_t;
-
-/// @todo Write simple buffer for mailbox in FRAM.
-#if 0
-#pragma SET_DATA_SECTION(".mailbox")
-
-// Mailbox is 64 solts of 64 byte packets (4kB).
-packet_t mailbox[64];
-
-uint16_t *mb_start = (uint16_t *)
-uint16_t *mb_end   = (uint16_t *)
-
-#pragma SET_DATA_SECTION()
-#endif
-
 /**
  * @defgroup init Initialisation
  * @brief Peripheral initialisation.
@@ -138,6 +120,11 @@ void led_set(uint8_t byte);
  * @test See if this works.
  */
 void led_clear(void);
+
+/**
+ *
+ */
+void led_flash(void);
 
 /** @} */
 

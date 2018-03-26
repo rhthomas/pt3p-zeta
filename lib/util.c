@@ -1,6 +1,6 @@
 #include <util.h>
 
-extern volatile uint8_t exit_loop;
+// extern volatile uint8_t exit_loop;
 
 void io_init(void)
 {
@@ -76,6 +76,17 @@ void led_clear(void)
 {
     PJOUT = 0;
     P3OUT = 0;
+}
+
+void led_flash(void)
+{
+    uint8_t i;
+    for (i = 0; i < 5; i++) {
+        led_set(0xFF);
+        __delay_cycles(4.8e5);
+        led_clear();
+        __delay_cycles(4.8e5);
+    }
 }
 
 inline void enter_lpm5(void)
