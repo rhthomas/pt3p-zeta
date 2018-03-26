@@ -249,9 +249,11 @@ uint8_t zeta_get_rssi(void)
     spi_cs_high();
 #endif // MANUAL
 
-    zeta_read_byte(); // '#'
-    zeta_read_byte(); // 'Q'
-    return zeta_read_byte(); // RSSI value.
+    uint8_t i, rssi;
+    for (i = 3; i > 0; i--) {
+        zeta_read_byte(&rssi);
+    }
+    return rssi; // RSSI value.
 }
 
 void zeta_get_vers(void)
@@ -267,9 +269,11 @@ void zeta_get_vers(void)
 #endif // MANUAL
 
     // Get version from radio '#V4.00'
-    uint8_t cnt;
+    uint8_t cnt, out;
     for (cnt = 6; cnt > 0; cnt--) {
-        zeta_read_byte();
+        if (!zeta_read_byte(&out)) {
+
+        }
     }
 
     exit_loop = 0;
@@ -288,9 +292,11 @@ void zeta_get_settings(uint8_t settings[])
 #endif // MANUAL
 
     // Get settings from radio '#?[8bytes]'
-    uint8_t byte;
+    uint8_t byte, out;
     for (byte = 0; byte < 10; byte++) {
-        settings[byte] = zeta_read_byte();
+        if (!zeta_read_byte(&out)) {
+            settings[byte] = out;
+        }
     }
 
     exit_loop = 0;
@@ -332,7 +338,7 @@ void zeta_send_close(void)
 #endif // MANUAL
 }
 
-void zeta_send_packet(uint8_t packet[], uint8_t len)
+void zeta_send_packet(uint8_t *packet, uint8_t len)
 {
     zeta_send_open(CHANNEL, len);
     uint8_t i;
@@ -346,7 +352,7 @@ void zeta_send_packet(uint8_t packet[], uint8_t len)
 // RX
 //--------------------------------------
 
-uint8_t zeta_read_byte(void)
+error_t zeta_read_byte(uint8_t *out)
 {
     if (zeta_wait_irq()) {
         return ERROR_TIMEOUT;
@@ -355,24 +361,41 @@ uint8_t zeta_read_byte(void)
 #ifdef MANUAL
     spi_cs_low();
 #endif // MANUAL
-    uint8_t out = spi_xfer(0x00);
+    *out = spi_xfer(0x00);
 #ifdef MANUAL
     spi_cs_high();
 #endif // MANUAL
-    return out;
+    return ERROR_OK;
 }
 
-void zeta_rx_packet(uint8_t packet[])
+void zeta_rx_packet(uint8_t *packet)
 {
-    uint8_t i = 0, len = 0;
+    uint8_t i = 0, len = 0, out = 0;
     // Get whole packet from FIFO.
-    packet[i++] = zeta_read_byte(); // '#'
-    packet[i++] = zeta_read_byte(); // 'R'
-    packet[i++] = len = zeta_read_byte(); // Length of packet.
-    packet[i++] = zeta_read_byte(); // RSSI
+
+    //    packet[i++] = zeta_read_byte(); // '#'
+    if (!zeta_read_byte(&out)) {
+        packet[i++] = out;
+    }
+    //    packet[i++] = zeta_read_byte(); // 'R'
+    if (!zeta_read_byte(&out)) {
+        packet[i++] = out;
+    }
+    //    packet[i++] = zeta_read_byte(); // length
+    if (!zeta_read_byte(&out)) {
+        packet[i++] = len = out;
+    }
+    //    packet[i++] = zeta_read_byte(); // RSSI
+    if (!zeta_read_byte(&out)) {
+        packet[i++] = out;
+    }
+
     // The actual packet contents.
     for (; len > 0; len--) {
-        packet[i++] = zeta_read_byte();
+//        packet[i++] = zeta_read_byte();
+        if (!zeta_read_byte(&out)) {
+            packet[i++] = out;
+        }
     }
     // Clear exit_loop flag.
     exit_loop = 0;

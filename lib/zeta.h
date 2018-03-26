@@ -266,7 +266,7 @@ void zeta_send_close(void);
  * @param packet : Pointer to byte packet to send.
  * @param len : Length of packet.
  */
-void zeta_send_packet(uint8_t packet[], uint8_t len);
+void zeta_send_packet(uint8_t *packet, uint8_t len);
 
 /** @} */
 
@@ -281,7 +281,7 @@ void zeta_send_packet(uint8_t packet[], uint8_t len);
  *
  * @return Byte from the FIFO buffer.
  */
-uint8_t zeta_read_byte(void);
+error_t zeta_read_byte(uint8_t *out);
 
 /**
  * @brief Read packet from FIFO loop until empty.
@@ -296,7 +296,7 @@ uint8_t zeta_read_byte(void);
  * @test Confirm that this works as expected.
  * @note Call zeta_wait_irq() after each Rx'd packet.
  */
-void zeta_rx_packet(uint8_t* packet);
+void zeta_rx_packet(uint8_t *packet);
 
 /**
  * @brief Receive packet from radio module.

@@ -13,12 +13,12 @@
 volatile uint8_t exit_loop = 0;
 
 #ifdef TXER
-uint8_t msg[5u] = {'H','E','L','L','O'};
+//uint8_t msg[16u] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+uint8_t count[1] = {0};
 #else
-uint8_t in_packet[5u + 4u]; ///< Array for received data.
+//uint8_t in_packet[16u + 4u]; ///< Array for received data.
+uint8_t in_count[1u + 4u];
 #endif
-
-uint8_t settings[10u];
 
 void main(void)
 {
@@ -40,17 +40,20 @@ void main(void)
 
     // Main loop.
     while (1) {
-//        zeta_get_vers();
-//        zeta_get_settings(settings);
 #ifdef TXER
-        zeta_send_packet(msg, sizeof(msg));
-        __delay_cycles(24e5);
+//        zeta_send_packet(msg, sizeof(msg));
+        zeta_send_packet(count, 1);
+        count[0]++;
+        __delay_cycles(12e6);
+        P3OUT ^= BIT7;// Toggle LED.
 #else
-        zeta_rx_mode(CHANNEL, 5u);
-        zeta_rx_packet(in_packet);
-        __delay_cycles(24e4);
+//        zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
+//        zeta_rx_packet(in_packet);
+        zeta_rx_mode(CHANNEL, 1);
+        zeta_rx_packet(in_count);
+        led_set(in_count[4]);
+        __delay_cycles(24e5);
 #endif // TXER
-        P3OUT ^= BIT7; // Toggle LED.
     }
 }
 
