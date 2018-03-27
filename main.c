@@ -17,22 +17,24 @@
 #include "zeta.h"        // Radio
 #include "hibernation.h" // Hibernus
 
+volatile uint8_t exit_loop = 0;
 uint8_t in_packet[1u + 4u] = {0};
 
 /* Code to execute when gated by UB20.
  */
 void node_inactive(void)
 {
-    __delay_cycles(24e5); // Allows time for start-up (required and min).
+    // Set Rx mode.
     zeta_select_mode(1);
+    // Operating on channel 15 with packet size of 64 bytes.
     zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
-
+    // Get incoming packet and write to mailbox FIFO.
     if (zeta_rx_packet(in_packet)) {
-        // Handle timeout task here.
+        exit_loop = 0;
     } else {
-        // Display last valid reception on the LEDs.
+        // Show received value on LEDs.
         led_set(in_packet[4]);
-        __delay_cycles(24e5);
+        __delay_cycles(48e6);
     }
 
     // Check the supply hasn't come up meanwhile.
@@ -64,10 +66,12 @@ void main(void)
     // System setup.
     io_init();
     clock_init();
+    timer_init();
     spi_init();
     zeta_init();
 
     // 1ms delay to wait for comparator output to be set.
+    /// @test Is this required, with the slow start-up of the radio?
     __delay_cycles(24e3);
     if (!COMP_ON) {
         node_inactive();
