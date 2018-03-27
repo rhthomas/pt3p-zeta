@@ -11,7 +11,7 @@
  * -------+
  *        |
  *    P2.0|-> Transmit output (UCA0TXD)
- *    P2.1|<- Receive input (UCA0RXD)
+ *    P2.1|<- Receive input   (UCA0RXD)
  *        |
  * -------+
  * ```
@@ -43,8 +43,6 @@ void uart_init(void);
  * @brief Print character over UART.
  *
  * @param ch : Character byte to print.
- * @bug This is working (Saleae) but not on the serial line? Perhaps this is
- * because I'm pulling the UART through the other MSP programmer?
  */
 void uart_putc(unsigned char ch);
 

@@ -34,17 +34,17 @@ void main(void)
 
 #ifdef TXER
     zeta_select_mode(2); // Put radio in ready mode.
-#else
-    zeta_select_mode(1); // Put radio in receive mode.
-#endif // TXER
 
     while (1) {
-#ifdef TXER
         zeta_send_packet(msg, sizeof(msg));
         msg[0]++;
         __delay_cycles(12e6);
         P3OUT ^= BIT7; // Toggle LED.
+    }
 #else
+    zeta_select_mode(1); // Put radio in receive mode.
+
+    while (1) {
         zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
         if (zeta_rx_packet(in_packet)) {
             exit_loop = 0;
@@ -54,6 +54,6 @@ void main(void)
         // Display last valid reception on the LEDs.
         led_set(in_packet[4]);
         __delay_cycles(24e5);
-#endif // TXER
     }
+#endif // TXER
 }

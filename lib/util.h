@@ -47,9 +47,9 @@ typedef enum {
  */
 
 /**
- * @brief Initialise IO pins and buses.
+ * @brief Initialise IO pins.
  *
- * All ports are output, driven low and interrupt flags are cleared.
+ * Power-supply latch is driven high to keep the supply of power to the node.
  *
  * @see ULP4.1
  */
@@ -61,7 +61,7 @@ void io_init(void);
  * | Clock | Module | Freq. |
  * |-------|--------|-------|
  * | MCLK  | DCO    | 24MHz |
- * | SMCLK | DCO    | 3MHz  |
+ * | SMCLK | DCO/8  | 3MHz  |
  * | ACLK  | VLO    | 10kHz |
  */
 void clock_init(void);
@@ -83,18 +83,22 @@ void timer_init(void);
 
 /**
  * @brief Start running the timer.
+ *
+ * @pre timer_init() must be called before starting the timer for it to work.
  */
 inline void timer_start(void);
 
 /**
  * @brief Halt the timer.
+ *
+ * @see timer_reset()
  */
 inline void timer_stop(void);
 
 /**
  * @brief Reset the count of the timer.
  *
- * Used in the timeout functionality.
+ * @note Called at the end of timer_stop().
  */
 inline void timer_reset(void);
 
@@ -109,20 +113,17 @@ inline void timer_reset(void);
 /**
  * @brief Write byte to on-board LEDs.
  *
- * @param byte : Value to write.
- * @test See if this works.
+ * @param byte : Value to display.
  */
 void led_set(uint8_t byte);
 
 /**
  * @brief Clear all the on-board LEDs.
- *
- * @test See if this works.
  */
 void led_clear(void);
 
 /**
- *
+ * @brief Flash the LEDs to indicate a timeout has occured.
  */
 void led_flash(void);
 

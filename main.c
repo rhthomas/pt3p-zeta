@@ -12,9 +12,9 @@
  * down.
  */
 
-#include "util.h" // System setup functions
-#include "uart.h" // Debugging
-#include "zeta.h" // Radio
+#include "util.h"        // System setup functions
+#include "uart.h"        // Debugging
+#include "zeta.h"        // Radio
 #include "hibernation.h" // Hibernus
 
 volatile uint8_t exit_loop = 0;
@@ -24,10 +24,12 @@ uint8_t in_packet[1u + 4u] = {0};
  */
 void node_inactive(void)
 {
-    zeta_select_mode(1); // Set Rx mode.
+    // Set Rx mode.
+    zeta_select_mode(1);
     // Operating on channel 15 with packet size of 64 bytes.
     zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
-    if (zeta_rx_packet(in_packet)) { // Get incoming packet and write to mailbox FIFO.
+    // Get incoming packet and write to mailbox FIFO.
+    if (zeta_rx_packet(in_packet)) {
         exit_loop = 0;
     } else {
         // Show received value on LEDs.
@@ -37,7 +39,7 @@ void node_inactive(void)
 
     // Check the supply hasn't come up meanwhile.
     if (!COMP_ON) {
-        power_off();     // Shutdown node.
+        power_off(); // Shutdown node.
     }
 }
 

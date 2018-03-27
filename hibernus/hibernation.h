@@ -11,12 +11,12 @@
  *
  * Citation: If you are using this code for your research please cite:
  *
- * [1]    D. Balsamo, A. S. Weddell, G. V. Merrett, B. M. Al-Hashimi,
+ *  [1]   D. Balsamo, A. S. Weddell, G. V. Merrett, B. M. Al-Hashimi,
  * D. Brunelli and L. Benini, "Hibernus: Sustaining Computation During
  * Intermittent Supply for Energy-Harvesting Systems," in IEEE Embedded
  * Systems Letters, vol. 7, no. 1, pp. 15-18, March 2015.
  *
- * [2]    D. Balsamo; A. Weddell; A. Das; A. Arreola; D. Brunelli;
+ *  [2]   D. Balsamo; A. Weddell; A. Das; A. Arreola; D. Brunelli;
  * B. Al-Hashimi; G. Merrett; L. Benini, "Hibernus++: A Self-Calibrating and
  * Adaptive System for Transiently-Powered Embedded Devices," in IEEE
  * Transactions on Computer-Aided Design of Integrated Circuits and Systems,
@@ -27,7 +27,6 @@
  *
  * @copyright Copyright 2016, Domenico Balsamo, All rights reserved.
  * @remarks Modifications by Rhys Thomas <rt8g15@soton.ac.uk>.
- * @test See if hibernus works with LPM4.5.
  */
 
 #ifndef HIBERNATION_H
@@ -88,10 +87,6 @@ void Hibernate(void);
 /**
  * @brief Restores the state of the processor once the power supply is
  * sufficient.
- *
- * 1.
- *
- * @todo Document this.
  */
 void Restore(void);
 
@@ -129,10 +124,6 @@ inline void int_rising(void);
 
 /**
  * @brief ISR for external comparator trigger.
- *
- * 1.
- *
- * @todo Document this.
  */
 __interrupt void PORT1_ISR(void);
 

@@ -23,7 +23,7 @@ void zeta_init(void)
     spi_cs_high();
 #endif // MANUAL
 
-    P1OUT &= ~SDN; // hold device in wake state
+    P1OUT &= ~SDN; // Hold device in wake state.
 
     // Wait for CODEC to be ready for commands.
     // __delay_cycles(24e6);

@@ -12,12 +12,12 @@
  *        |
  * Radio: |
  *    P1.4|<- Interrupt request (nIRQ)
- *    P1.5|-> Shutdown (SDN)
+ *    P1.5|-> Shutdown          (SDN)
  * SPI:   |
- *    P1.3|-> CS (UCB0STE)
- *    P1.6|-> Data Out (UCB0SIMO)
- *    P1.7|<- Data In (UCB0SOMI)
- *    P2.2|-> Serial Clock Out (UCB0CLK)
+ *    P1.3|-> CS                (UCB0STE)
+ *    P1.6|-> Data Out          (UCB0SIMO)
+ *    P1.7|<- Data In           (UCB0SOMI)
+ *    P2.2|-> Serial Clock Out  (UCB0CLK)
  *        |
  * -------+
  * ```
@@ -42,7 +42,7 @@
 #define SDN (BIT5)
 
 /**
- * @brief Interrupt request P1.4.
+ * @brief Interrupt request input (P1.4).
  *
  * @note Active low.
  */
@@ -201,7 +201,6 @@ void zeta_reset_default(void);
  * @brief Get RSSI from receiver [ATQ].
  *
  * @return Received signal strength (0-255).
- * @test Check this method is correct. Does nIRQ need to go high?
  * @ingroup debug
  */
 uint8_t zeta_get_rssi(void);
