@@ -63,7 +63,7 @@
  *
  * Called within zeta_sync_byte().
  *
- * @param byte : Byte to flip.
+ * @param[in] byte : Byte to flip.
  * @return Reversed byte.
  * @see zeta_sync_byte()
  */
@@ -87,6 +87,10 @@ void zeta_init(void);
 
 /**
  * @brief Wait for interrupt from CODEC (data ready).
+ *
+ * @return Any errors while polling nIRQ pin.
+ * @retval ERROR_OK - No errors.
+ * @retval ERROR_TIMEOUT - Receive timeout, perhaps false wake-up.
  */
 error_t zeta_wait_irq(void);
 
@@ -104,7 +108,7 @@ void zeta_ready(void);
 /**
  * @brief Set mode of the device [ATM].
  *
- * @param mode : Operating mode of the radio.
+ * @param[in] mode : Operating mode of the radio.
  *  | Value | Name  | Description |
  *  |-------|-------|-------------|
  *  | 1     | RX    | ZetaPlus enters RX mode using last RX configured settings.     |
@@ -116,8 +120,8 @@ void zeta_select_mode(uint8_t mode);
 /**
  * @brief Receive mode configuration [ATR].
  *
- * @param ch : Channel.
- * @param pLength : Packet length.
+ * @param[in] ch : Channel.
+ * @param[in] pLength : Packet length.
  */
 void zeta_rx_mode(uint8_t ch, uint8_t pLength);
 
@@ -128,10 +132,10 @@ void zeta_rx_mode(uint8_t ch, uint8_t pLength);
  * a form of addressing. If the bytes are set, the radio will only pass on data
  * which contains the correct sync bytes.
  *
- * @param sync1 : Byte 1.
- * @param sync2 : Byte 2.
- * @param sync3 : Byte 3.
- * @param sync4 : Byte 4.
+ * @param[in] sync1 : Byte 1.
+ * @param[in] sync2 : Byte 2.
+ * @param[in] sync3 : Byte 3.
+ * @param[in] sync4 : Byte 4.
  * @note Set byte to `0xAA` if not required.
  * @note Reverse order bytes, i.e. `2B`=`D4`, `D4`=`2B`.
  */
@@ -140,7 +144,7 @@ void zeta_sync_byte(uint8_t sync1, uint8_t sync2, uint8_t sync3, uint8_t sync4);
 /**
  * @brief Set baud-rate between radio and MCU [ATH].
  *
- * @param baud : Data rate between ZetaPlus and MCU.
+ * @param[in] baud : Data rate between ZetaPlus and MCU.
  *  | `baud` | Data Rate |
  *  |--------|-----------|
  *  | 0      | 9.6kbps   |
@@ -154,7 +158,7 @@ void zeta_set_baud_host(uint8_t baud);
 /**
  * @brief Set baud-rate of RF [ATB].
  *
- * @param baud : RF data rate, must be at least double host baud.
+ * @param[in] baud : RF data rate, must be at least double host baud.
  *  | `baud` | RF Rate   |
  *  |--------|-----------|
  *  | 1      | 4.8kbps   |
@@ -171,18 +175,18 @@ void zeta_set_baud_rf(uint8_t baud);
 /**
  * @brief Set RF output power [ATP].
  *
- * @param pwr : RF TX output power (1-127).
+ * @param[in] pwr : RF TX output power (1-127).
  * @note Not a linear function. The output power varies depending on factors
- * such as supply voltage, impedance miss-match etc. Adjustment resolution of
- * the TX output power is very fine (step size < 0.1dB) when operating near
- * max. power setting, but becomes coarser as output level is reduced.
+ *  such as supply voltage, impedance miss-match etc. Adjustment resolution of
+ *  the TX output power is very fine (step size < 0.1dB) when operating near
+ *  max. power setting, but becomes coarser as output level is reduced.
  */
 void zeta_set_rf_power(uint8_t pwr);
 
 /**
  * @brief Enable data error checking [ATE].
  *
- * @param en : Enable CRC error checking.
+ * @param[in] en : Enable CRC error checking.
  *  | | |
  *  |-|-|
  *  | 0    | Disable error checking (default) |
@@ -227,7 +231,7 @@ void zeta_get_vers(void);
  * 7. Sync byte 4.
  * 8. Channel number (0-15).
  *
- * @param settings - Address of array to store the read settings.
+ * @param[out] settings - Address of array to store the read settings.
  * @ingroup debug
  */
 void zeta_get_settings(uint8_t *settings);
@@ -241,8 +245,8 @@ void zeta_get_settings(uint8_t *settings);
 /**
  * @brief Transmit mode configuration [ATS].
  *
- * @param ch : Channel to transmit on.
- * @param pLength : Length of packet.
+ * @param[in] ch : Channel to transmit on.
+ * @param[in] pLength : Length of packet.
  * @see CHANNEL.
  */
 void zeta_send_open(uint8_t ch, uint8_t pLength);
@@ -250,7 +254,7 @@ void zeta_send_open(uint8_t ch, uint8_t pLength);
 /**
  * @brief Write byte to TX buffer (to send).
  *
- * @param data : Data byte to send.
+ * @param[in] data : Data byte to send.
  */
 void zeta_write_byte(uint8_t data);
 
@@ -262,8 +266,8 @@ void zeta_send_close(void);
 /**
  * @brief Send byte packet over radio.
  *
- * @param packet : Pointer to byte packet to send.
- * @param len : Length of packet.
+ * @param[in] packet : Pointer to byte packet to send.
+ * @param[in] len : Length of packet.
  */
 void zeta_send_packet(uint8_t *packet, uint8_t len);
 
@@ -278,7 +282,7 @@ void zeta_send_packet(uint8_t *packet, uint8_t len);
 /**
  * @brief Read one byte from FIFO only.
  *
- * @param out - Address to write read byte to.
+ * @param[out] out - Address to write read byte to.
  * @return Any errors during read.
  * @retval ERROR_OK - No errors.
  * @retval ERROR_TIMEOUT - Receive timeout, perhaps false wake-up.
