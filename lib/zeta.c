@@ -26,9 +26,7 @@ void zeta_init(void)
     P1OUT &= ~SDN; // Hold device in wake state.
 
     // Wait for CODEC to be ready for commands.
-    // __delay_cycles(24e6);
     zeta_ready();
-    zeta_reset_default();
 
     /* Configure device:
      * 1. Max. transmit power.
@@ -36,10 +34,10 @@ void zeta_init(void)
      * 3. Host baud rate 4.
      * 4. RF baud rate 6.
      */
-//    zeta_set_rf_power(127u);
-//    zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
-//    zeta_set_baud_host(4u);
-//    zeta_set_baud_rf(6u);
+    zeta_set_rf_power(127u);
+    zeta_sync_byte(0xAA, 0xAA, 0xAA, 0xAA);
+    zeta_set_baud_host(4u);
+    zeta_set_baud_rf(6u);
 }
 
 error_t zeta_wait_irq(void)
@@ -48,7 +46,6 @@ error_t zeta_wait_irq(void)
     // Wait for nIRQ to go low.
     while (P1IN & IRQ) {
         if (exit_loop) {
-            timer_stop();
             return ERROR_TIMEOUT;
         }
     }
@@ -262,7 +259,6 @@ void zeta_get_vers(void)
             return; // Exit if error.
         }
     }
-    exit_loop = 0;
 }
 
 void zeta_get_settings(uint8_t *settings)
@@ -285,7 +281,6 @@ void zeta_get_settings(uint8_t *settings)
             return; // Exit if error.
         }
     }
-    exit_loop = 0;
 }
 
 //--------------------------------------
@@ -364,10 +359,8 @@ error_t zeta_rx_packet(uint8_t *packet)
         if (zeta_read_byte(&packet[i])) {
             return ERROR_TIMEOUT;
         }
-        if (i == 2) {
-            len = packet[i];
-        }
     }
+    len = packet[2];
 
     // The actual packet contents.
     for (; len > 0; len--) {
@@ -379,6 +372,10 @@ error_t zeta_rx_packet(uint8_t *packet)
     // Packet successfully received.
     return ERROR_OK;
 }
+
+//--------------------------------------
+// TIMEOUT PROTECTION
+//--------------------------------------
 
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void TIMER0_A0_ISR(void)

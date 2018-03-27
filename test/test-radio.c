@@ -10,7 +10,7 @@
 
 volatile uint8_t exit_loop = 0;
 
-//#define TXER ///< Node is transmitter.
+#define TXER ///< Node is transmitter.
 
 #ifdef TXER
 //uint8_t msg[16u] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -19,6 +19,8 @@ uint8_t msg[1] = {0}; // For count example.
 //uint8_t in_packet[16u + 4u]; ///< Array for received data.
 uint8_t in_packet[1u + 4u] = {0, 0, 0, 0, 0}; // For count example.
 #endif
+
+uint8_t settings[10u];
 
 void main(void)
 {
@@ -45,12 +47,11 @@ void main(void)
     zeta_select_mode(1); // Put radio in receive mode.
 
     while (1) {
+        zeta_get_settings(settings);
         zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
         if (zeta_rx_packet(in_packet)) {
             exit_loop = 0;
-        } /*else {
-            led_set(in_packet[4]);
-        } */
+        }
         // Display last valid reception on the LEDs.
         led_set(in_packet[4]);
         __delay_cycles(24e5);
