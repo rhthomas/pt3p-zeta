@@ -34,10 +34,15 @@
 // State definitions.
 #define COMP_ON (P1IN & EXT_COMP) ///< Tests the state of the comparator output.
 
+#define BUFFER_SIZE 10u ///< Number of bytes in mailbox buffer.
+
+typedef struct {
+    uint8_t buffer[BUFFER_SIZE];
+    uint8_t head, tail;
+} buffer_t;
+
 typedef enum {
-    ERROR_OK = 0,
-    ERROR_NOBUFS,
-    ERROR_TIMEOUT
+    ERROR_OK = 0, ERROR_NOBUFS, ERROR_TIMEOUT
 } error_t;
 
 /**
@@ -125,5 +130,27 @@ inline void enter_lpm5(void);
  * that is called, regardless of what mode of operation is running.
  */
 inline void power_off(void);
+
+/**
+ * @defgroup mailbox Mailbox
+ * @brief Functions for reading/writing data to the mailbox.
+ * @{
+ */
+
+/**
+ * @brief Push new data into the box.
+ *
+ * @param[in] new - Data to be added.
+ */
+error_t mailbox_push(uint8_t new);
+
+/**
+ * @brief Pop oldest data from the box.
+ *
+ * @param[out] out - Address to write popped data to.
+ */
+error_t mailbox_pop(uint8_t *out);
+
+/** @} */
 
 #endif // UTIL_H

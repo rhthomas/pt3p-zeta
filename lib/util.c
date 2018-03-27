@@ -1,5 +1,9 @@
 #include <util.h>
 
+// This is only done once (when flashing).
+#pragma PERSISTENT (mailbox)
+buffer_t mailbox = {0};
+
 void io_init(void)
 {
     // PORT 1
@@ -94,4 +98,32 @@ inline void power_off(void)
 {
     // Active-low shut off when driving a PMOS.
     P4OUT |= PS_LATCH;
+}
+
+error_t mailbox_push(uint8_t new)
+{
+    uint8_t next = mailbox.head + 1;
+    if (next >= BUFFER_SIZE) {
+        next = 0;
+    }
+    if (next != mailbox.tail) {
+        mailbox.buffer[mailbox.head] = new;
+        mailbox.head = next;
+        return ERROR_OK;
+    }
+    return ERROR_NOBUFS;
+}
+
+error_t mailbox_pop(uint8_t *out)
+{
+    if (mailbox.head == mailbox.tail) {
+        return ERROR_NOBUFS;
+    }
+    uint8_t next = mailbox.tail + 1;
+    if (next >= BUFFER_SIZE) {
+        next = 0;
+    }
+    *out = mailbox.buffer[mailbox.tail];
+    mailbox.tail = next;
+    return ERROR_OK;
 }
