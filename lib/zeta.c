@@ -1,6 +1,6 @@
 #include "zeta.h"
 
-extern volatile uint8_t exit_loop;
+volatile uint8_t exit_loop = 0;
 
 uint8_t reverse(uint8_t byte)
 {
@@ -46,6 +46,7 @@ error_t zeta_wait_irq(void)
     // Wait for nIRQ to go low.
     while (P1IN & IRQ) {
         if (exit_loop) {
+            timer_stop();
             return ERROR_TIMEOUT;
         }
     }
@@ -236,6 +237,7 @@ uint8_t zeta_get_rssi(void)
             return 0; // Exit if error.
         }
     }
+    exit_loop = 0;
     return rssi; // RSSI value.
 }
 
@@ -259,6 +261,7 @@ void zeta_get_vers(void)
             return; // Exit if error.
         }
     }
+    exit_loop = 0;
 }
 
 void zeta_get_settings(uint8_t *settings)
@@ -281,6 +284,7 @@ void zeta_get_settings(uint8_t *settings)
             return; // Exit if error.
         }
     }
+    exit_loop = 0;
 }
 
 //--------------------------------------
@@ -357,6 +361,7 @@ error_t zeta_rx_packet(uint8_t *packet)
     // # R <len> <rssi>
     for (i = 0; i < 4; i++) {
         if (zeta_read_byte(&packet[i])) {
+            exit_loop = 0;
             return ERROR_TIMEOUT;
         }
     }
@@ -365,10 +370,12 @@ error_t zeta_rx_packet(uint8_t *packet)
     // The actual packet contents.
     for (; len > 0; len--) {
         if (zeta_read_byte(&packet[i++])) {
+            exit_loop = 0;
             return ERROR_TIMEOUT;
         }
     }
 
+    exit_loop = 0;
     // Packet successfully received.
     return ERROR_OK;
 }

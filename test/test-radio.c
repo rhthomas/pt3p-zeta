@@ -8,9 +8,7 @@
 #include "util.h" // System setup functions
 #include "zeta.h" // Radio
 
-volatile uint8_t exit_loop = 0;
-
-#define TXER ///< Node is transmitter.
+//#define TXER ///< Node is transmitter.
 
 #ifdef TXER
 //uint8_t msg[16u] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -30,31 +28,26 @@ void main(void)
     // Setup peripherals.
     io_init();
     clock_init();
-    timer_init();
     spi_init();
     zeta_init();
 
 #ifdef TXER
-    zeta_select_mode(2); // Put radio in ready mode.
-
     while (1) {
         zeta_send_packet(msg, sizeof(msg));
         msg[0]++;
         __delay_cycles(12e6);
+//        __delay_cycles(24e5);
         P3OUT ^= BIT7; // Toggle LED.
     }
 #else
-    zeta_select_mode(1); // Put radio in receive mode.
-
+    __delay_cycles(9e5); // Allows time for start-up (required and min).
     while (1) {
-        zeta_get_settings(settings);
         zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
         if (zeta_rx_packet(in_packet)) {
-            exit_loop = 0;
+            // Handle timeout task here.
         }
         // Display last valid reception on the LEDs.
         led_set(in_packet[4]);
-        __delay_cycles(24e5);
     }
 #endif // TXER
 }

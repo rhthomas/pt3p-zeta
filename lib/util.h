@@ -10,8 +10,8 @@
  * MSP430FR5739
  * -------+
  *        |
- *    P1.0|<- External comparator (INT).
- *    P4.0|<- UB20M power-gated output (INT).
+ *    P1.0|<- External comparator      (INT)
+ *    P4.0|<- UB20M power-gated output (INT)
  *        |
  * -------+
  * ```
@@ -35,7 +35,7 @@
 #define COMP_ON (P1IN & EXT_COMP) ///< Tests the state of the comparator output.
 
 typedef enum {
-    ERROR_OK,
+    ERROR_OK = 0,
     ERROR_NOBUFS,
     ERROR_TIMEOUT
 } error_t;
@@ -70,37 +70,19 @@ void clock_init(void);
 
 /**
  * @defgroup timers Timers
- * @brief Control of timer module.
+ * @brief Control of timer module for timeout protection.
  * @{
  */
 
 /**
- * @brief Setup timer for periodic transmissions.
- *
- * @ingroup init
- */
-void timer_init(void);
-
-/**
  * @brief Start running the timer.
- *
- * @pre timer_init() must be called before starting the timer for it to work.
  */
 inline void timer_start(void);
 
 /**
- * @brief Halt the timer.
- *
- * @see timer_reset()
+ * @brief Stop and reset the timer.
  */
 inline void timer_stop(void);
-
-/**
- * @brief Reset the count of the timer.
- *
- * @note Called at the end of timer_stop().
- */
-inline void timer_reset(void);
 
 /** @} */
 

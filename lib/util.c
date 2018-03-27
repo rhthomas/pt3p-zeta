@@ -1,7 +1,5 @@
 #include <util.h>
 
-// extern volatile uint8_t exit_loop;
-
 void io_init(void)
 {
     // PORT 1
@@ -39,32 +37,20 @@ void clock_init(void)
     CSCTL0_H = 0;
 }
 
-void timer_init(void)
+void timer_start(void)
 {
     // ACLK, upmode, clear.
-    TA0CTL |= TASSEL__ACLK;
+    TA0CTL |= (TASSEL__ACLK + MC_1);
     TA0CCTL0 = CCIE; // CCR0 interrupt enabled.
-//    TA0CCR0 = 0x2711; // ~1s delay.
-//    TA0CCR0 = 0x1389; // ~0.5s delay.
     TA0CCR0 = 0x4E21; // ~2s delay.
-}
-
-inline void timer_start(void)
-{
     __bis_SR_register(GIE); // Enable interrupts for timeout.
-    TA0CTL |= MC_1;         // Start counting.
 }
 
-inline void timer_stop(void)
+void timer_stop(void)
 {
-    TA0CTL &= ~MC_1; // Stop counting.
-    timer_reset();   // Reset counter to 0.
+    TA0CTL = MC_0; // Stop counting.
+    TA0R = 0;      // Reset counter.
     __bic_SR_register(GIE);
-}
-
-inline void timer_reset(void)
-{
-    TA0R = 0;
 }
 
 void led_set(uint8_t byte)
