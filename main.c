@@ -26,6 +26,8 @@ void node_inactive(void)
     zeta_select_mode(1);
     zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
 
+    P1OUT |= BIT2; // [dbg] show that we are ready to rx packet.
+
     if (zeta_rx_packet(in_packet)) {
         // Timeout!
     } else {

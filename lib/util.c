@@ -1,6 +1,6 @@
 #include <util.h>
 
-// This is only done once (when flashing).
+// This is only initialised once (when flashing).
 #pragma PERSISTENT (mailbox)
 buffer_t mailbox = {0};
 
@@ -102,10 +102,7 @@ inline void power_off(void)
 
 error_t mailbox_push(uint8_t new)
 {
-    uint8_t next = mailbox.head + 1;
-    if (next >= BUFFER_SIZE) {
-        next = 0;
-    }
+    uint8_t next = (mailbox.head + 1) % BUFFER_SIZE;
     if (next != mailbox.tail) {
         mailbox.buffer[mailbox.head] = new;
         mailbox.head = next;
@@ -119,10 +116,7 @@ error_t mailbox_pop(uint8_t *out)
     if (mailbox.head == mailbox.tail) {
         return ERROR_NOBUFS;
     }
-    uint8_t next = mailbox.tail + 1;
-    if (next >= BUFFER_SIZE) {
-        next = 0;
-    }
+    uint8_t next = (mailbox.tail + 1) % BUFFER_SIZE;
     *out = mailbox.buffer[mailbox.tail];
     mailbox.tail = next;
     return ERROR_OK;

@@ -16,6 +16,9 @@
 // The mailbox buffer exists *somewhere*.
 extern buffer_t mailbox;
 
+#pragma PERSISTENT(j)
+uint8_t j = 0;
+
 int main(void)
 {
     // Stop watchdog timer.
@@ -28,20 +31,21 @@ int main(void)
     clock_init();
 
     // Display contents of buffer.
-    uint8_t i;
+    uint8_t i, out;
     for (i = 0; i < BUFFER_SIZE; i++) {
         led_set(mailbox.buffer[i]);
-        __delay_cycles(24e6);
+        __delay_cycles(6e6);
     }
     led_clear();
 
-    uint8_t out;
     // Push in new data (head data + 1).
-    if (mailbox_push(mailbox.buffer[mailbox.head] + 1)) {
+    if (mailbox_push(j)) {
         // Flash LEDs when puffer is full.
         led_flash();
         // Pop to clear some room
         mailbox_pop(&out);
+    } else {
+        j++;
     }
 
     // Shutdown the node.

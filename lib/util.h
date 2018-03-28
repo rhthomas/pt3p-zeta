@@ -141,6 +141,9 @@ inline void power_off(void);
  * @brief Push new data into the box.
  *
  * @param[in] new - Data to be added.
+ * @return Error status.
+ * @retval ERROR_OK - No errors, packet added to buffer.
+ * @retval ERROR_NOBUFS - Buffer full, packet lost.
  */
 error_t mailbox_push(uint8_t new);
 
@@ -148,6 +151,9 @@ error_t mailbox_push(uint8_t new);
  * @brief Pop oldest data from the box.
  *
  * @param[out] out - Address to write popped data to.
+ * @return Error status.
+ * @retval ERROR_OK - No errors, packet popped from buffer.
+ * @retval ERROR_NOBUFS - Buffer empty, Nothing to pop.
  */
 error_t mailbox_pop(uint8_t *out);
 
