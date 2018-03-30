@@ -28,13 +28,17 @@ void node_inactive(void)
 
     P1OUT |= BIT2; // [dbg] show that we are ready to rx packet.
 
-    if (zeta_rx_packet(in_packet)) {
-        // Timeout!
-    } else {
-        // Show received value on LEDs.
-        led_set(in_packet[4]);
-        __delay_cycles(48e6);
-    }
+    // Check for any packets in the buffer.
+    /// @warning Not yet tested.
+    do {
+        if (zeta_rx_packet(in_packet)) {
+            // Timeout!
+        } else {
+            // Show received value on LEDs.
+            led_set(in_packet[4]);
+            __delay_cycles(48e6);
+        }
+    } while (!(P1IN & IRQ));
 
     // Check the supply hasn't come up meanwhile.
     if (!COMP_ON) {
@@ -44,18 +48,18 @@ void node_inactive(void)
 
 /* Code to execute when gated by comparator.
  */
- void node_active(void)
- {
-     // This will trigger hibernus ISR.
+void node_active(void)
+{
+    // This will trigger hibernus ISR.
     __bis_SR_register(GIE);
-     Hibernus();
-     // Count up some LEDs as demonstration.
-     uint8_t n;
-     while (1) {
-         led_set(n++);
-         __delay_cycles(24e5);
-     }
- }
+    Hibernus();
+    // Count up some LEDs as demonstration.
+    uint8_t n;
+    while (1) {
+        led_set(n++);
+        __delay_cycles(24e5);
+    }
+}
 
 void main(void)
 {
@@ -71,7 +75,7 @@ void main(void)
     // 1ms delay to wait for comparator output to be set.
     __delay_cycles(24e3);
     if (!COMP_ON) {
-        __delay_cycles(9e5);
+        __delay_cycles(9e5); // Required delay, system always times out w/o it.
         node_inactive();
     }
 
