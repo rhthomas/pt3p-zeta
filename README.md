@@ -25,7 +25,14 @@ until the supply is sufficient to handle the data. Hence after a SPI transfer
 from the radio, the data will be written to FRAM and the MCU will sleep.
 
 ### Supply Monitoring
-`// TODO Write this.`
+The supply of the node is monitored by a low-power comparator that triggers at
+approximately 3V. When the supply is above 3V, the node is active and runs the
+code for its *normal* operation. When the supply is below this, the node will
+cut its power-supply and only wake-up when there is activity on the channel.
+Should a packet be incoming the device is woken, writes the received packet to
+non-volatile memory (NVM), and then shuts down again. This keeps the inactive
+consumption very low -- on the order of nano-amps -- allowing the inactive
+device to survive for a very long time.
 
 ### RF Radio
 The radio that will be used - and hence the repo is for - is the ZETAPLUS module
@@ -34,7 +41,11 @@ communications and a very low power sleep state. The actual radio part of the
 module is the Si4455 from Silicon labs.
 
 ### Wake-up Trigger
-`// TODO Write this.`
+The wake-up trigger is in the form of the UB20 voltage detector and associated
+rectifying antenna from the [University of Bristol](http://www.bristol.ac.uk/engineering/research/em/research/zero-standby-power/).
+This ultra-low-power and very sensitive voltage detector will connect the power
+supply to the MCU when the rectenna detects RF activity, thus allowing it to
+receive the packet.
 
 ## The Repository
 This repository contains the code necessary for driving the ZETAPLUS radio that
@@ -84,10 +95,10 @@ compiled Doxygen is available [here](https://rhthomas.github.io/docs/zeta).
 - [x] Configure radio with libraries (i.e. set RF baud and sync bytes).
 - [x] Get transmission working.
 - [x] Receive packet over RF.
-- [ ] Store packet in NVM.
-- [ ] Wake-up node over RF with UB20.
+- [x] Store packet in NVM.
+- [x] Wake-up node over RF with UB20.
     - [x] Investigate relationship between rectenna output voltage and range.
-- [ ] Write unified `main.c` program.
+- [x] Write unified `main.c` program.
 	- [x] Test Hibernus.
     	- [x] Test comparator.
     	- [x] Test Hibernus in isolation.
@@ -98,4 +109,4 @@ compiled Doxygen is available [here](https://rhthomas.github.io/docs/zeta).
     - [x] Incorporate hibernus into shutdown hardware.
     - [x] Test `main.c` without radio modules (Hardware triggers i.e. buttons).
     - [x] Test `main.c` with radio hardware included.
-    - [ ] Incorporate NVM packet storage.
+    - [x] Incorporate NVM packet storage.

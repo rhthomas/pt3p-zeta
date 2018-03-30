@@ -18,6 +18,7 @@
 #include "hibernation.h" // Hibernus
 
 uint8_t in_packet[1u + 4u] = {0};
+uint8_t out;
 
 /* Code to execute when gated by UB20.
  */
@@ -30,12 +31,18 @@ void node_inactive(void)
 
     // Check for any packets in the buffer.
     /// @warning Not yet tested.
+    /// @todo Does zeta_rx_mode need to go in here?
     do {
         if (zeta_rx_packet(in_packet)) {
             // Timeout!
         } else {
+            // Write to mailbox.
+            mailbox_push(in_packet[4]);
+            // Pop data from mailbox.
+            mailbox_pop(&out);
             // Show received value on LEDs.
-            led_set(in_packet[4]);
+            led_set(out);
+            // Hold for a few seconds.
             __delay_cycles(48e6);
         }
     } while (!(P1IN & IRQ));
