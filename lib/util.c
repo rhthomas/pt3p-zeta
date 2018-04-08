@@ -1,6 +1,6 @@
 #include <util.h>
 
-// This is only initialised once (when flashing).
+// Only initialised when flashing.
 #pragma PERSISTENT (mailbox)
 buffer_t mailbox = {0};
 

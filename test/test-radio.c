@@ -8,7 +8,7 @@
 #include "util.h" // System setup functions
 #include "zeta.h" // Radio
 
-//#define TXER ///< Node is transmitter.
+#define TXER ///< Node is transmitter.
 
 #ifdef TXER
 //uint8_t msg[16u] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -33,11 +33,10 @@ void main(void)
 
 #ifdef TXER
     while (1) {
+        led_set(msg[0]);
         zeta_send_packet(msg, sizeof(msg));
         msg[0]++;
-        __delay_cycles(12e6);
-//        __delay_cycles(24e5);
-        P3OUT ^= BIT7; // Toggle LED.
+        __delay_cycles(36e6);
     }
 #else
     __delay_cycles(9e5); // Allows time for start-up (required and min).

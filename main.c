@@ -30,8 +30,6 @@ void node_inactive(void)
     P1OUT |= BIT2; // [dbg] show that we are ready to rx packet.
 
     // Check for any packets in the buffer.
-    /// @warning Not yet tested.
-    /// @todo Does zeta_rx_mode need to go in here?
     do {
         if (zeta_rx_packet(in_packet)) {
             // Timeout!
@@ -43,7 +41,7 @@ void node_inactive(void)
             // Show received value on LEDs.
             led_set(out);
             // Hold for a few seconds.
-            __delay_cycles(48e6);
+            __delay_cycles(24e6);
         }
     } while (!(P1IN & IRQ));
 
