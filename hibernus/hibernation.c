@@ -22,33 +22,6 @@ int t;
 
 #pragma SET_DATA_SECTION()
 
-#if defined(USE_SWITCHES)
-/// Trigger voltage of the external comparator.
-const unsigned int vol[256] = {
-    1966, 1973, 1979, 1986, 1992, 1999, 2006, 2012, 2019, 2025, 2032, 2038,
-    2045, 2051, 2058, 2065, 2071, 2078, 2084, 2091, 2097, 2104, 2110, 2117,
-    2124, 2130, 2137, 2143, 2150, 2156, 2163, 2169, 2176, 2183, 2189, 2196,
-    2202, 2209, 2215, 2222, 2228, 2235, 2242, 2248, 2255, 2261, 2268, 2274,
-    2281, 2287, 2294, 2301, 2307, 2314, 2320, 2327, 2333, 2340, 2346, 2353,
-    2360, 2366, 2373, 2379, 2386, 2392, 2399, 2405, 2412, 2419, 2425, 2432,
-    2438, 2445, 2451, 2458, 2464, 2471, 2478, 2484, 2491, 2497, 2504, 2510,
-    2517, 2523, 2530, 2537, 2543, 2550, 2556, 2563, 2569, 2576, 2582, 2589,
-    2596, 2602, 2609, 2615, 2622, 2628, 2635, 2641, 2648, 2655, 2661, 2668,
-    2674, 2681, 2687, 2694, 2700, 2707, 2714, 2720, 2727, 2733, 2740, 2746,
-    2753, 2759, 2766, 2773, 2779, 2786, 2792, 2799, 2805, 2812, 2818, 2825,
-    2832, 2838, 2845, 2851, 2858, 2864, 2871, 2877, 2884, 2891, 2897, 2904,
-    2910, 2917, 2923, 2930, 2936, 2943, 2950, 2956, 2963, 2969, 2976, 2982,
-    2989, 2995, 3002, 3009, 3015, 3022, 3028, 3035, 3041, 3048, 3054, 3061,
-    3068, 3074, 3081, 3087, 3094, 3100, 3107, 3113, 3120, 3127, 3133, 3140,
-    3146, 3153, 3159, 3166, 3172, 3179, 3186, 3192, 3199, 3205, 3212, 3218,
-    3225, 3231, 3238, 3245, 3251, 3258, 3264, 3271, 3277, 3284, 3290, 3297,
-    3304, 3310, 3317, 3323, 3330, 3336, 3343, 3349, 3356, 3363, 3369, 3376,
-    3382, 3389, 3395, 3402, 3408, 3415, 3422, 3428, 3435, 3441, 3448, 3454,
-    3461, 3467, 3474, 3481, 3487, 3494, 3500, 3507, 3513, 3520, 3526, 3533,
-    3540, 3546, 3553, 3559, 3566, 3572, 3579, 3585, 3592, 3599, 3605, 3612,
-    3618, 3625, 3631, 3638};
-#endif // USE_SWITCHES
-
 /// General Purpose registers addresses.
 const unsigned int gen[230] = {
     0x100, 0x102, 0x104, 0x120, 0x12a, 0x130, 0x140, 0x144, 0x146, 0x150, 0x152,
@@ -77,87 +50,49 @@ unsigned int i;
 
 void Hibernus(void)
 {
-#if defined(USE_SWITCHES)
-    // Setting threshold VMIN=2.27V
-    Set_V(VMIN);// V Restore
-    __delay_cycles(1000);// For setting the external comparator
-#endif // USE_SWITCHES
-
-    // Restore procedure
-    // Waiting until the system reaches the restore threshold
-//    t = (P1IN & BIT0); // t = 0;
-//    t = !COMP_OFF;
+    // Restore procedure.
+    // Waiting until the system reaches the restore threshold.
     t = COMP_ON;
     if (t == 0) {
         *FLAG_interrupt = 1;
         int_rising();
 
-#if defined(USE_LPM5)
-        enter_lpm5();
-#elif defined(USE_SHDN)
         power_off();
-        __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
-#else
-        __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
-#endif // USE_LPM5
+        // LPM4, External Comparator will force exit.
+        __bis_SR_register(LPM4_bits + GIE);
         __no_operation();
     }
 
-    // It is not the first time but the state has not been saved properly
+    // It is not the first time but the state has not been saved properly.
     if (*CC_Check == 0) {
         *CC_Check = 0;
 
-#if defined(USE_SWITCHES)
-        unsigned int hibernate_2 = (unsigned int)(VMINN); // threshold for hibernate 2.17V
-        Set_V(hibernate_2);
-        __delay_cycles(1000);
-#endif // USE_SWITCHES
-
         *FLAG_interrupt = 2;
         int_falling();
 
-        __bis_SR_register(GIE); // Set interrupt
+        __bis_SR_register(GIE); // Set interrupt.
         __no_operation();
     }
 
-    //the first time the system does not need a restore
+    // The first time the system does not need a restore.
     if ((*CC_Check != 0) && (*CC_Check != 1)) {
         *CC_Check = 0;
-
-#if defined(USE_SWITCHES)
-        unsigned int hibernate = (unsigned int)(VMINN); //threshold for hibernate 2.17V
-        Set_V(hibernate);
-        __delay_cycles(1000);
-#endif // USE_SWITCHES
 
         *FLAG_interrupt = 2;
         int_falling();
 
-        __bis_SR_register(GIE); // Set interrupt
+        __bis_SR_register(GIE); // Set interrupt.
         __no_operation();
     }
 
     // If you have to restore a previous state.
     if (*CC_Check == 1) {
-#if defined(HIB_DEBUG)
-        // Debugging: Restore
-        P1DIR |= BIT3;
-        P1OUT |= BIT3;
-        P2OUT &= ~BIT6;
-#endif // HIB_DEBUG
         Restore();
     }
 }
 
 void Hibernate(void)
 {
-#if defined(HIB_DEBUG)
-    // Debugging: Start hibernation.
-    P1DIR |= BIT7;
-    P1OUT |= BIT7;
-    P2OUT &= ~BIT6;
-#endif // HIB_DEBUG
-
     *CC_Check = 0;
 
     // Copy core registers to FRAM.
@@ -186,11 +121,6 @@ void Hibernate(void)
     pro = 0;
     Save_Register();
     *CC_Check = 1;
-
-#if defined(HIB_DEBUG)
-    // Debugging: Hibernate finished.
-    P1OUT &= ~BIT7;
-#endif // HIB_DEBUG
 }
 
 void Restore(void)
@@ -230,17 +160,6 @@ void Restore(void)
 
     *current_SP = *FRAM_pc;
 
-#if defined(HIB_DEBUG)
-    // Debugging: Restore finished.
-    P1OUT &= ~BIT3;
-#endif
-#if defined(USE_SWITCHES)
-    // Setting the comparator with the Hibernate threshold
-    unsigned int hibernate_3 = (unsigned int)(VMINN);//for debug
-    Set_V(hibernate_3);
-    __delay_cycles(1000);
-#endif // USE_SWITCHES
-
     *FLAG_interrupt = 2;
     int_falling();
 
@@ -249,11 +168,6 @@ void Restore(void)
 
     *CC_Check = 0;
     pro = 1;
-
-#if defined(HIB_DEBUG)
-    P2DIR |= BIT6;
-    P2OUT |= BIT6;
-#endif // HIB_DEBUG
 }
 
 void Save_RAM(void)
@@ -331,39 +245,6 @@ void Restore_Register(void)
     CSCTL0_H = 0x01;
 }
 
-#if defined(USE_SWITCHES)
-void Set_V(unsigned int v)
-{
-    counter_check = 0;
-    for (i = 0; i < 256; i++) {
-        if (v > vol[i]) {
-            counter_check++;
-        } else {
-            break;
-        }
-    }
-
-    // GPIO setting for the external comparator.
-    P4OUT &= ~(BIT0);// blue
-    P2OUT &= ~(BIT1);// yellow
-    P2OUT &= ~(BIT2);// green
-    P3OUT &= ~(BIT3);// orange
-    P1OUT &= ~(BIT0);// blue
-    P1OUT &= ~(BIT5);// yellow
-    P1OUT &= ~(BIT6);// green
-    P2OUT &= ~(BIT5);// orange
-
-    P4OUT |= (BIT0 & (counter_check & 0x0001));// blue
-    P2OUT |= (BIT1 & (counter_check & 0x0002));// yellow
-    P2OUT |= (BIT2 & (counter_check & 0x0004));// green
-    P3OUT |= (BIT3 & (counter_check & 0x0008));// orange
-    P1OUT |= (BIT0 & ((counter_check & 0x0010) >> 4));// blue
-    P1OUT |= (BIT5 & (counter_check & 0x0020));// yellow
-    P1OUT |= (BIT6 & (counter_check & 0x0040));// green
-    P2OUT |= (BIT5 & ((counter_check & 0x0080) >> 2));// orange
-}
-#endif // USE_SWITCHES
-
 inline void int_falling(void)
 {
     P1IFG = 0; // Clear P1 interrupt flag.
@@ -394,69 +275,27 @@ __interrupt void PORT1_ISR(void)
             Hibernate();
 
             if (pro == 0) {
-#if defined(USE_SWITCHES)
-                Set_V(VMIN + 200);
-                __delay_cycles(500);
-#endif // USE_SWITCHES
-//                t = (P1IN & BIT0); // t = 1;
-//                t = !COMP_OFF; // t = 1;
                 t = COMP_ON;
                 if (t == 0) {
                     *FLAG_interrupt = 4;
                     int_rising();
-#if defined(HIB_DEBUG)
-                    //For Debugging: LPM
-                    P1DIR |= BIT1;
-                    P1OUT |= BIT1;
-#endif // HIB_DEBUG
                     // Enter sleep state.
-#if defined(USE_LPM5)
-                    enter_lpm5();
-#elif defined(USE_SHDN)
                     power_off();
                     __bis_SR_register(LPM4_bits + GIE); // LPM4, External Comparator will force exit
-#else
-                    __bis_SR_register(LPM4_bits + GIE);
-#endif // USE_LPM5
                     __no_operation();
                 } else {
-#if defined(USE_SWITCHES)
-                    unsigned int value_7 = VMINN;
-                    Set_V(value_7);
-                    __delay_cycles(1000);
-#endif // USE_SWITCHES
                     *FLAG_interrupt = 2;
                     int_falling();
-#if defined(HIB_DEBUG)
-                    P2DIR |= BIT6;
-                    P2OUT |= BIT6;
-#endif // HIB_DEBUG
                     // Return to active mode with interrupts enabled.
                     __bis_SR_register(GIE);
                     __no_operation();
-#if defined(HIB_DEBUG)
-                    P2DIR |= BIT6;
-                    P2OUT |= BIT6;
-#endif // HIB_DEBUG
                 }
             }
         }
 
         if (*FLAG_interrupt == 4) {
-#if defined(HIB_DEBUG)
-            P1OUT &= ~BIT1;
-#endif // HIB_DEBUG
-#if defined(USE_SWITCHES)
-            unsigned int value_7 = VMINN;
-            Set_V(value_7);
-            __delay_cycles(1000);
-#endif // USE_SWITCHES
             *FLAG_interrupt = 2;
             int_falling();
-#if defined(HIB_DEBUG)
-            P2DIR |= BIT6;
-            P2OUT |= BIT6;
-#endif // HIB_DEBUG
             // Return to active mode with interrupts enabled.
             __bis_SR_register(GIE);
             __no_operation();

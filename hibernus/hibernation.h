@@ -35,10 +35,6 @@
 #include <msp430.h>
 #include "util.h"
 
-// Hibernus configuration.
-//#define USE_SWITCHES ///< Use switches to change trigger point of comparator.
-//#define HIB_DEBUG ///< Debug hibernus with specific I/O outputs.
-
 // Interrupt and restoring.
 #define INT   (0xEDD8) ///< Address storing the interrupt flag.
 #define CHECK (0xEDDC) ///< Address storing the check flag.
@@ -53,12 +49,6 @@
 
 // PC.
 #define PC (0xEDF0) ///< Address storing the program counter.
-
-// Threshold.
-#ifdef USE_SWITCHES
-#define VMIN  (2270) ///< Restore threshold.
-#define VMINN (2170) ///< Hibernate threshold.
-#endif // USE_SWITCHES
 
 /**
  * @defgroup hib Hibernus
@@ -104,13 +94,6 @@ void Save_Register(void);
  * @brief Restores general purpose registers from FRAM.
  */
 void Restore_Register(void);
-
-/**
- * @brief Set the trigger voltage of the external comparator.
- *
- * @param v : Voltage of the new trigger point (mV).
- */
-void Set_V(unsigned int v);
 
 /**
  * @brief Set up P1.0 interrupt on the falling edge.

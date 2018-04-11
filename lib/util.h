@@ -23,10 +23,6 @@
 #include <msp430.h>
 #include <stdint.h>
 
-// Config defines.
-// #define USE_LPM5 ///< When sleeping, go as low as LPM4.5.
-#define USE_SHDN ///< When done, shutdown the processor.
-
 // Connection definitions.
 #define PS_LATCH (BIT0) ///< Power-supply latch output on P4.0.
 #define EXT_COMP (BIT0) ///< External comparator output connects to P1.0.
