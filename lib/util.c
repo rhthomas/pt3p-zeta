@@ -9,7 +9,7 @@ void io_init(void)
     // PORT 1
     P1DIR = 0xFF & ~(EXT_COMP);
     P1OUT = 0;
-    P1REN = 0; //EXT_COMP;
+    P1REN = 0;
     P1IE |= EXT_COMP;
     // PORT 4
     P4DIR = 0xFF;

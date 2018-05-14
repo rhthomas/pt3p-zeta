@@ -36,7 +36,9 @@ void main(void)
         led_set(msg[0]);
         zeta_send_packet(msg, sizeof(msg));
         msg[0]++;
-        __delay_cycles(36e6);
+        __delay_cycles(12e6);
+        led_clear();
+        __delay_cycles(24e6);
     }
 #else
     __delay_cycles(9e5); // Allows time for start-up (required and min).

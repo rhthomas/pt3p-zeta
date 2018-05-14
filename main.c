@@ -24,26 +24,21 @@ uint8_t out;
  */
 void node_inactive(void)
 {
-    zeta_select_mode(1);
+//    zeta_select_mode(1);
     zeta_rx_mode(CHANNEL, sizeof(in_packet) - 4u);
 
-    P1OUT |= BIT2; // [dbg] show that we are ready to rx packet.
-
-    // Check for any packets in the buffer.
-    do {
-        if (zeta_rx_packet(in_packet)) {
-            // Timeout!
-        } else {
-            // Write to mailbox.
-            mailbox_push(in_packet[4]);
-            // Pop data from mailbox.
-            mailbox_pop(&out);
-            // Show received value on LEDs.
-            led_set(out);
-            // Hold for a few seconds.
-            __delay_cycles(24e6);
-        }
-    } while (!(P1IN & IRQ));
+    if (zeta_rx_packet(in_packet)) {
+        // Timeout!
+    } else {
+        // Write to mailbox.
+        mailbox_push(in_packet[4]);
+        // Pop data from mailbox.
+        mailbox_pop(&out);
+        // Show received value on LEDs.
+        led_set(out);
+        // Hold for a few seconds.
+        __delay_cycles(24e6);
+    }
 
     // Check the supply hasn't come up meanwhile.
     if (!COMP_ON) {
@@ -77,10 +72,8 @@ void main(void)
     spi_init();
     zeta_init();
 
-    // 1ms delay to wait for comparator output to be set.
-    __delay_cycles(24e3);
+    __delay_cycles(10e5);
     if (!COMP_ON) {
-        __delay_cycles(9e5); // Required delay, system always times out w/o it.
         node_inactive();
     }
 
